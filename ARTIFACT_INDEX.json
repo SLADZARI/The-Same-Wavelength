@@ -45,9 +45,9 @@
     {
       "artifactId": "ilka.result.calculator-foundation",
       "documentType": "RESULT",
-      "currentVersion": "0.4",
+      "currentVersion": "0.5",
       "status": "REVIEW",
-      "path": "results/calculator-foundation.v0.4.md",
+      "path": "results/calculator-foundation.v0.5.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-10-06"

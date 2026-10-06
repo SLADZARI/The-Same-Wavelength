@@ -1,5 +1,5 @@
 const STORAGE_KEY="ilka-boat-value-v1";
-const STATE_VERSION=2;
+const STATE_VERSION=3;
 const Core=window.ILKACore;
 
 const scoreDefs=[
@@ -13,13 +13,8 @@ const scoreDefs=[
 ];
 
 const defaultSettings={
-  targetLocation:"Gdańsk, PL",
-  rentPLN:3150,
-  budgetUSD:1000,
-  horizonMonths:12,
-  plnPerEur:4.30,
-  usdPerEur:1.15,
-  diyShadowRatePLN:31.40
+  targetLocation:"Gdańsk, PL",rentPLN:3150,budgetUSD:1000,horizonMonths:12,
+  plnPerEur:4.30,usdPerEur:1.15,diyShadowRatePLN:31.40
 };
 
 const uid=()=>globalThis.crypto?.randomUUID?.()||("id-"+Date.now()+"-"+Math.random().toString(16).slice(2));
@@ -28,6 +23,7 @@ const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
 const num=v=>Core.num(v);
 const money=n=>new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(Number.isFinite(Number(n))?Number(n):0);
+const nativeMoney=(n,c="EUR")=>{try{return new Intl.NumberFormat("en-US",{style:"currency",currency:c,maximumFractionDigits:2}).format(Number.isFinite(Number(n))?Number(n):0);}catch{return String(n)+" "+c;}};
 const signed=n=>(Number(n)>0?"+":"")+money(n);
 const escapeHtml=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 
@@ -35,43 +31,67 @@ function newImprovement(name="Новая работа"){
   return {id:uid(),name,category:"INTERIOR",cashEUR:0,diyHours:0,upliftEUR:0,factLabel:"INFERENCE",notes:""};
 }
 
+function newOffer(candidateId){
+  return {
+    offerId:uid(),candidateId,observedAt:today(),sourceUrl:"",sourceSite:"",externalListingId:"",
+    sellerType:"UNKNOWN",priceType:"ASK",amount:0,currency:"EUR",
+    buyerPremium:null,taxFees:[],derivedAllInPrice:0,auctionEnd:null,offerExpiry:null,
+    status:"OBSERVED",included:"",conditions:"",comment:""
+  };
+}
+
 function newBoat(name="Новый кандидат"){
   return {
-    id:uid(),name,url:"",sourceSite:"",sellerType:"UNKNOWN",offerObservedAt:today(),offerComment:"",
-    location:"",purchaseEUR:0,
-    lengthM:0,beamM:0,draftM:0,displacementT:0,material:"UNKNOWN",
-    cabins:0,berths:0,comfortablePeople:0,moveInState:"UNKNOWN",
-    engineStatus:"unknown",engineHP:0,fuelBurnLPH:0,cruiseKn:0,
+    id:uid(),name,model:"",location:"",
+    lengthM:0,beamM:0,draftM:0,transportHeightM:0,displacementT:0,craneLiftWeightT:0,material:"UNKNOWN",
+    cabins:0,cabinsEvidence:"UNKNOWN",berths:0,comfortablePeople:0,moveInState:"UNKNOWN",
+    engineStatus:"unknown",engineHP:0,fuelBurnLPH:0,fuelBurnEvidence:"UNKNOWN",cruiseKn:0,
     legalGate:"UNKNOWN",structuralGate:"UNKNOWN",insuranceGate:"UNKNOWN",
-    localFeasible:false,localLogisticsEUR:0,logisticsImpossible:false,
-    selfPropFeasible:false,seaDistanceNm:0,seaTimeFactor:1.15,dieselEUR:2,
+    localFeasibility:"UNKNOWN",localLogisticsEUR:0,localLogisticsEvidence:"UNKNOWN",logisticsImpossible:false,
+    seaFeasibility:"UNKNOWN",seaDistanceNm:0,seaTimeFactor:1.15,dieselEUR:2,
     canalFeesEUR:0,enRouteMarinasEUR:0,crewFoodEUR:0,crewTravelEUR:0,seaPrepEUR:0,seaContingencyEUR:0,
-    roadFeasible:false,roadTransportEUR:0,loadingCraneEUR:0,unloadingCraneEUR:0,permitsEscortEUR:0,roadPrepEUR:0,roadContingencyEUR:0,
-    dueDiligenceEUR:400,closingDocsEUR:0,hullRefitEUR:0,mechanicalRefitEUR:0,safetyRefitEUR:0,moveInInteriorEUR:0,initialReserveEUR:500,
-    overlapRentMonths:0,yardStorageDuringRefitEUR:0,temporaryHousingEUR:0,
-    expectedResaleEUR:0,quickSaleEUR:0,sellingCostsEUR:0,riskBufferEUR:500,
-    improvements:[],
-    marinaMonthlyEUR:0,selectedMarinaOfferId:"",
-    insuranceMonthlyEUR:45,maintenanceMonthlyEUR:150,electricityMonthlyEUR:60,heatingMonthlyEUR:60,localFuelMonthlyEUR:30,internetMonthlyEUR:30,winterMonthlyEUR:50,miscMonthlyEUR:50,
+    roadFeasibility:"UNKNOWN",roadTransportEUR:0,roadTransportEvidence:"UNKNOWN",
+    loadingCraneEUR:0,loadingCraneEvidence:"UNKNOWN",unloadingCraneEUR:0,unloadingCraneEvidence:"UNKNOWN",
+    dismantlingRequired:"UNKNOWN",permitsEscortEUR:0,roadPrepEUR:0,roadContingencyEUR:0,
+    towFeasibility:"UNKNOWN",towCostEUR:0,towCostEvidence:"UNKNOWN",towPrepEUR:0,towContingencyEUR:0,
+    dueDiligenceEUR:400,dueDiligenceEvidence:"UNKNOWN",closingDocsEUR:0,closingDocsEvidence:"UNKNOWN",
+    hullRefitEUR:0,hullRefitEvidence:"UNKNOWN",mechanicalRefitEUR:0,mechanicalRefitEvidence:"UNKNOWN",
+    safetyRefitEUR:0,safetyRefitEvidence:"UNKNOWN",moveInInteriorEUR:0,moveInInteriorEvidence:"UNKNOWN",
+    emergencyReserveEUR:500,overlapRentMonths:0,yardStorageDuringRefitEUR:0,temporaryHousingEUR:0,
+    expectedResaleEUR:0,expectedResaleEvidence:"UNKNOWN",quickSaleEUR:0,quickSaleEvidence:"UNKNOWN",
+    sellingCostsEUR:0,sellingCostsEvidence:"UNKNOWN",riskBufferEUR:500,improvements:[],
+    marinaMonthlyEUR:0,marinaMonthlyEvidence:"UNKNOWN",selectedMarinaOfferId:"",
+    insuranceMonthlyEUR:45,insuranceMonthlyEvidence:"UNKNOWN",
+    maintenanceMonthlyEUR:150,electricityMonthlyEUR:60,heatingMonthlyEUR:60,localFuelMonthlyEUR:30,internetMonthlyEUR:30,winterMonthlyEUR:50,miscMonthlyEUR:50,
     hullScore:5,layoutScore:5,propulsionScore:5,comfortScore:5,refitEaseScore:5,energyScore:5,docsScore:5
   };
 }
 
+function inferEvidence(raw,field){
+  const explicit=raw?.[field+"Evidence"];
+  if(["UNKNOWN","ESTIMATE","QUOTE","ACTUAL"].includes(explicit)) return explicit;
+  return num(raw?.[field])>0?"ESTIMATE":"UNKNOWN";
+}
+
 function migrateBoat(raw){
   const b={...newBoat(raw?.name||"Кандидат"),...(raw||{})};
-  b.sourceSite=b.sourceSite||sourceFromUrl(b.url);
-  b.offerObservedAt=b.offerObservedAt||today();
-  b.sellerType=b.sellerType||"UNKNOWN";
+  b.model=b.model||"";
   b.comfortablePeople=num(b.comfortablePeople)||num(b.berths)||0;
   b.moveInState=b.moveInState||"UNKNOWN";
-  b.legalGate=b.legalGate||"UNKNOWN";
-  b.structuralGate=b.structuralGate||"UNKNOWN";
-  b.insuranceGate=b.insuranceGate||"UNKNOWN";
+  b.legalGate=b.legalGate||"UNKNOWN"; b.structuralGate=b.structuralGate||"UNKNOWN"; b.insuranceGate=b.insuranceGate||"UNKNOWN";
+  b.localFeasibility=b.localFeasibility||((raw?.localFeasible===true)?"PASS":"UNKNOWN");
+  b.seaFeasibility=b.seaFeasibility||((raw?.selfPropFeasible===true)?"PASS":"UNKNOWN");
+  b.roadFeasibility=b.roadFeasibility||((raw?.roadFeasible===true||num(raw?.roadTransportEUR)>0)?"PASS":"UNKNOWN");
+  b.towFeasibility=b.towFeasibility||"UNKNOWN";
   b.dueDiligenceEUR=raw?.dueDiligenceEUR ?? raw?.surveyDocsEUR ?? b.dueDiligenceEUR;
   b.expectedResaleEUR=raw?.expectedResaleEUR ?? raw?.resaleEUR ?? 0;
   b.quickSaleEUR=raw?.quickSaleEUR ?? (b.expectedResaleEUR?Math.round(b.expectedResaleEUR*0.75):0);
-  b.roadFeasible=raw?.roadFeasible ?? (num(raw?.roadTransportEUR)>0);
-  b.localFeasible=!!raw?.localFeasible;
+  b.emergencyReserveEUR=raw?.emergencyReserveEUR ?? raw?.initialReserveEUR ?? b.emergencyReserveEUR;
+  ["fuelBurn","localLogistics","roadTransport","loadingCrane","unloadingCrane","towCost","dueDiligence","closingDocs","hullRefit","mechanicalRefit","safetyRefit","moveInInterior","expectedResale","quickSale","sellingCosts","marinaMonthly","insuranceMonthly"].forEach(k=>{
+    b[k+"Evidence"]=inferEvidence(raw||{},k);
+  });
+  b.cabinsEvidence=b.cabinsEvidence||"UNKNOWN";
+  b.dismantlingRequired=b.dismantlingRequired||"UNKNOWN";
   b.improvements=Array.isArray(raw?.improvements)?raw.improvements.map(x=>({id:x.id||uid(),name:x.name||"Работа",category:x.category||"OTHER",cashEUR:num(x.cashEUR),diyHours:num(x.diyHours),upliftEUR:num(x.upliftEUR),factLabel:x.factLabel||"INFERENCE",notes:x.notes||""})):[];
   if(!b.improvements.length){
     if(num(raw?.interiorRefitEUR)>0) b.improvements.push({...newImprovement("Интерьер — legacy assumption"),cashEUR:num(raw.interiorRefitEUR),upliftEUR:0});
@@ -80,23 +100,51 @@ function migrateBoat(raw){
   return b;
 }
 
+function migrateOffer(raw){
+  const o={...newOffer(raw?.candidateId||""),...(raw||{})};
+  o.offerId=o.offerId||o.id||uid();
+  o.sourceUrl=o.sourceUrl||o.url||"";
+  o.sourceSite=o.sourceSite||sourceFromUrl(o.sourceUrl);
+  o.observedAt=o.observedAt||today();
+  o.priceType=o.priceType||"ASK"; o.currency=(o.currency||"EUR").toUpperCase(); o.status=o.status||"OBSERVED";
+  o.buyerPremium=o.buyerPremium??null; o.taxFees=Array.isArray(o.taxFees)?o.taxFees:[];
+  if(Core.maybeNum(o.derivedAllInPrice)===null && Core.maybeNum(o.amount)!==null) o.derivedAllInPrice=Core.offerAllInOriginal(o);
+  return o;
+}
+
+function legacyOfferFromBoat(raw,b){
+  if(!raw) return newOffer(b.id);
+  const hasLegacy=num(raw.purchaseEUR)>0 || raw.url || raw.sourceSite;
+  if(!hasLegacy) return newOffer(b.id);
+  return migrateOffer({
+    offerId:uid(),candidateId:b.id,observedAt:raw.offerObservedAt||today(),
+    sourceUrl:raw.url||"",sourceSite:raw.sourceSite||sourceFromUrl(raw.url||""),
+    sellerType:raw.sellerType||"UNKNOWN",priceType:"ASK",amount:num(raw.purchaseEUR),currency:"EUR",
+    buyerPremium:null,taxFees:[],derivedAllInPrice:num(raw.purchaseEUR),status:"OBSERVED",
+    comment:raw.offerComment||"Migrated from state v2."
+  });
+}
+
 function migrateState(raw){
-  const state=raw&&typeof raw==="object"?raw:{};
-  return {
-    version:STATE_VERSION,
-    settings:{...defaultSettings,...(state.settings||{})},
-    boats:(Array.isArray(state.boats)&&state.boats.length?state.boats:[newBoat()]).map(migrateBoat)
-  };
+  const old=raw&&typeof raw==="object"?raw:{};
+  const rawBoats=Array.isArray(old.boats)&&old.boats.length?old.boats:[newBoat()];
+  const boats=rawBoats.map(migrateBoat);
+  let offers=Array.isArray(old.offers)?old.offers.map(migrateOffer):[];
+  if(!offers.length) offers=rawBoats.map((x,i)=>legacyOfferFromBoat(x,boats[i]));
+  boats.forEach(b=>{if(!offers.some(o=>o.candidateId===b.id))offers.push(newOffer(b.id));});
+  return {version:STATE_VERSION,settings:{...defaultSettings,...(old.settings||{})},boats,offers};
 }
 
 function load(){
   try{return migrateState(JSON.parse(localStorage.getItem(STORAGE_KEY)));}
   catch{return migrateState(null);}
 }
+
 function save(){
   localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
   const el=$("#saveState"); if(el){el.textContent="сохранено";setTimeout(()=>el.textContent="автосохранение",650);}
 }
+
 function sourceFromUrl(url){
   try{return new URL(url).hostname.replace(/^www\./,"");}catch{return "";}
 }
@@ -104,10 +152,25 @@ function sourceFromUrl(url){
 let state=load();
 let selectedId=state.boats[0]?.id;
 let marinaEvidence={status:"loading",offers:[],path:"",error:""};
+let fixtureEvidence={status:"loading",data:null,path:"",error:""};
 let candidateFilter="all";
 
 function boat(){return state.boats.find(x=>x.id===selectedId)||state.boats[0];}
-function calc(b=boat()){return Core.calcCandidate(b,state.settings);}
+function offersFor(candidateId){
+  return state.offers.filter(o=>o.candidateId===candidateId);
+}
+
+function currentOffer(b=boat()){
+  if(!b)return null;
+  const list=offersFor(b.id);
+  const active=list.filter(o=>!["HISTORICAL","EXPIRED","WITHDRAWN","SOLD","REJECTED"].includes(o.status));
+  const sort=(a,z)=>String(z.observedAt||"").localeCompare(String(a.observedAt||"")) || String(z.offerId).localeCompare(String(a.offerId));
+  return (active.sort(sort)[0]||list.sort(sort)[0]||null);
+}
+
+function calc(b=boat()){
+  return Core.calcCandidate(b,state.settings,currentOffer(b));
+}
 
 function recommendationLabel(c){
   const map={

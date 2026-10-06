@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ILKA — Boat Value Calculator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">ILKA / acquisition radar</div>
+      <h1>Boat Value Calculator</h1>
+      <p>Сравниваем не цену объявления, а стоимость получить пригодный жилой актив в Польше.</p>
+    </div>
+    <div class="top-actions">
+      <button id="newBoatBtn">+ Добавить лодку</button>
+      <button id="exportBtn" class="secondary">Экспорт JSON</button>
+      <label class="button secondary file-label">Импорт JSON<input id="importInput" type="file" accept=".json" /></label>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel settings-panel">
+      <div class="section-title">
+        <div>
+          <div class="eyebrow">Общие допущения</div>
+          <h2>Цели и валюта</h2>
+        </div>
+        <div class="pill" id="saveState">автосохранение</div>
+      </div>
+      <div class="grid four">
+        <label>Текущая аренда, PLN/мес<input id="rentPLN" type="number" step="50"></label>
+        <label>Лимит бюджета, USD/мес<input id="budgetUSD" type="number" step="50"></label>
+        <label>PLN за € <span class="hint">плановый курс</span><input id="plnPerEur" type="number" step="0.01"></label>
+        <label>USD за € <span class="hint">плановый курс</span><input id="usdPerEur" type="number" step="0.01"></label>
+        <label>Горизонт, месяцев<input id="horizonMonths" type="number" min="1" max="120"></label>
+      </div>
+      <p class="note">Курсы здесь намеренно ручные: калькулятор должен оставаться воспроизводимым. Обновляйте их перед сравнением кандидатов.</p>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <div>
+          <div class="eyebrow">Портфель кандидатов</div>
+          <h2>Сравнение лодок</h2>
+        </div>
+      </div>
+      <div class="table-wrap"><table id="boatsTable"></table></div>
+    </section>
+
+    <section class="workspace">
+      <div class="panel editor">
+        <div class="section-title">
+          <div>
+            <div class="eyebrow">Карточка кандидата</div>
+            <h2 id="boatTitle">Лодка</h2>
+          </div>
+          <div class="row-actions">
+            <button id="duplicateBtn" class="secondary">Дублировать</button>
+            <button id="deleteBtn" class="danger">Удалить</button>
+          </div>
+        </div>
+
+        <nav class="tabs">
+          <button class="tab active" data-tab="boat">Лодка</button>
+          <button class="tab" data-tab="logistics">Логистика</button>
+          <button class="tab" data-tab="refit">Ремонт</button>
+          <button class="tab" data-tab="monthly">Месяц</button>
+          <button class="tab" data-tab="quality">Value score</button>
+        </nav>
+
+        <div id="tab-boat" class="tab-content active">
+          <div class="grid two">
+            <label>Название<input data-field="name" type="text"></label>
+            <label>Ссылка на объявление<input data-field="url" type="url"></label>
+            <label>Локация<input data-field="location" type="text"></label>
+            <label>Цена покупки, €<input data-field="purchaseEUR" type="number" min="0"></label>
+          </div>
+
+          <h3>Габариты</h3>
+          <div class="grid four">
+            <label>Длина, м<input data-field="lengthM" type="number" step="0.1"></label>
+            <label>Ширина, м<input data-field="beamM" type="number" step="0.05"></label>
+            <label>Осадка, м<input data-field="draftM" type="number" step="0.05"></label>
+            <label>Масса, т<input data-field="displacementT" type="number" step="0.5"></label>
+            <label>Высота для авто, м<input data-field="transportHeightM" type="number" step="0.05"></label>
+            <label>Материал<select data-field="material"><option>Steel</option><option>Aluminium</option><option>GRP</option><option>Wood</option><option>Mixed</option></select></label>
+            <label>Отдельных кают<input data-field="cabins" type="number" min="0"></label>
+            <label>Спальных мест<input data-field="berths" type="number" min="0"></label>
+          </div>
+
+          <h3>Двигатель</h3>
+          <div class="grid four">
+            <label>Статус<select data-field="engineStatus"><option value="running">Ходовой</option><option value="minor">Нужен мелкий ремонт</option><option value="major">Серьёзный ремонт</option><option value="dead">Не работает</option><option value="unknown">Неизвестно</option></select></label>
+            <label>Кол-во двигателей<input data-field="engineCount" type="number" min="0" max="4"></label>
+            <label>Мощность суммарно, hp<input data-field="engineHP" type="number"></label>
+            <label>Расход на крейсере, л/ч<input data-field="fuelBurnLPH" type="number" step="0.1"></label>
+            <label>Крейсерская скорость, kn<input data-field="cruiseKn" type="number" step="0.1"></label>
+            <label class="check"><input data-field="selfPropFeasible" type="checkbox"> Можно перегнать своим ходом</label>
+          </div>
+        </div>
+
+        <div id="tab-logistics" class="tab-content">
+          <div class="compare-callout">
+            <div><span>Морем</span><strong id="seaCostInline">—</strong></div>
+            <div><span>Авто</span><strong id="roadCostInline">—</strong></div>
+            <div><span>Рекомендуем</span><strong id="logisticsChoiceInline">—</strong></div>
+          </div>
+
+          <h3>Перегон своим ходом</h3>
+          <div class="grid four">
+            <label>Дистанция, nm<input data-field="seaDistanceNm" type="number"></label>
+            <label>Коэфф. часов <span class="hint">канал/манёвры</span><input data-field="seaTimeFactor" type="number" step="0.05"></label>
+            <label>Diesel, €/л<input data-field="dieselEUR" type="number" step="0.05"></label>
+            <label>Канал/сборы, €<input data-field="canalFeesEUR" type="number"></label>
+            <label>Стоянки по пути, €<input data-field="enRouteMarinasEUR" type="number"></label>
+            <label>Еда экипажа, €<input data-field="crewFoodEUR" type="number"></label>
+            <label>Дорога экипажа, €<input data-field="crewTravelEUR" type="number"></label>
+            <label>Подготовка к переходу, €<input data-field="seaPrepEUR" type="number"></label>
+            <label>Резерв перехода, €<input data-field="seaContingencyEUR" type="number"></label>
+          </div>
+
+          <h3>Автоперевозка</h3>
+          <div class="grid four">
+            <label>Дистанция, км<input data-field="roadDistanceKm" type="number"></label>
+            <label>Ставка перевозчика, €<input data-field="roadTransportEUR" type="number"></label>
+            <label>Кран погрузки, €<input data-field="loadingCraneEUR" type="number"></label>
+            <label>Разгрузка/спуск, €<input data-field="unloadingCraneEUR" type="number"></label>
+            <label>Разрешения + escort, €<input data-field="permitsEscortEUR" type="number"></label>
+            <label>Демонтаж/подготовка, €<input data-field="roadPrepEUR" type="number"></label>
+            <label>Резерв авто, €<input data-field="roadContingencyEUR" type="number"></label>
+          </div>
+        </div>
+
+        <div id="tab-refit" class="tab-content">
+          <p class="note">Сюда кладём только расходы, необходимые до нормальной эксплуатации/заселения. Косметику, которую можно делать потом, лучше считать отдельно.</p>
+          <div class="grid three">
+            <label>Survey / документы, €<input data-field="surveyDocsEUR" type="number"></label>
+            <label>Корпус / подводная часть, €<input data-field="hullRefitEUR" type="number"></label>
+            <label>Механика / двигатель, €<input data-field="mechanicalRefitEUR" type="number"></label>
+            <label>Безопасность / навигация, €<input data-field="safetyRefitEUR" type="number"></label>
+            <label>Жилой интерьер, €<input data-field="interiorRefitEUR" type="number"></label>
+            <label>Электрика / solar, €<input data-field="energyRefitEUR" type="number"></label>
+            <label>Прочий стартовый резерв, €<input data-field="initialReserveEUR" type="number"></label>
+            <label>Оценка цены продажи через горизонт, €<input data-field="resaleEUR" type="number"></label>
+          </div>
+        </div>
+
+        <div id="tab-monthly" class="tab-content">
+          <div class="grid three">
+            <label>Марина / место, €/мес<input data-field="marinaMonthlyEUR" type="number"></label>
+            <label>Страховка, €/мес<input data-field="insuranceMonthlyEUR" type="number"></label>
+            <label>Резерв ТО/ремонтов, €/мес<input data-field="maintenanceMonthlyEUR" type="number"></label>
+            <label>Электричество/shore, €/мес<input data-field="electricityMonthlyEUR" type="number"></label>
+            <label>Отопление/газ, €/мес<input data-field="heatingMonthlyEUR" type="number"></label>
+            <label>Локальное топливо, €/мес<input data-field="localFuelMonthlyEUR" type="number"></label>
+            <label>Интернет/связь, €/мес<input data-field="internetMonthlyEUR" type="number"></label>
+            <label>Зимовка/подъёмы, €/мес экв.<input data-field="winterMonthlyEUR" type="number"></label>
+            <label>Прочее, €/мес<input data-field="miscMonthlyEUR" type="number"></label>
+          </div>
+        </div>
+
+        <div id="tab-quality" class="tab-content">
+          <p class="note">0 = плохо/неизвестно, 10 = отлично. Цена сюда не входит — качество объекта считаем отдельно от стоимости.</p>
+          <div id="scoreInputs" class="score-inputs"></div>
+        </div>
+      </div>
+
+      <aside class="panel dashboard">
+        <div class="eyebrow">Decision radar</div>
+        <h2>Экономика кандидата</h2>
+        <div id="verdict" class="verdict"></div>
+
+        <div class="metrics" id="metrics"></div>
+
+        <div class="radar-card">
+          <svg id="radar" viewBox="0 0 360 360" role="img" aria-label="Radar score"></svg>
+        </div>
+
+        <div class="formula-box">
+          <h3>Что считаем</h3>
+          <p><b>Landed cost</b> = покупка + оптимальная логистика + обязательный стартовый ремонт.</p>
+          <p><b>12m cash</b> = landed + эксплуатация за горизонт.</p>
+          <p><b>12m economic</b> = cash − ожидаемая остаточная стоимость.</p>
+          <p><b>Δ vs rent</b> = economic cost − аренда квартиры за тот же период.</p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer>ILKA calculator · данные сохраняются локально в браузере</footer>
+  <script src="app.js"></script>
+</body>
+</html>

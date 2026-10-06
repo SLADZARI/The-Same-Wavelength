@@ -88,6 +88,18 @@ const base=()=>({
 }
 
 {
+  const incompleteAuction={
+    amount:10000,currency:"EUR",priceType:"BID",
+    buyerPremium:{ratePct:12.5,evidenceState:"QUOTE"},
+    taxFees:[{label:"VAT treatment",amount:null,ratePct:null,evidenceState:"UNKNOWN"}],
+    derivedAllInPrice:null
+  };
+  const e=Core.offerEconomics(incompleteAuction,settings);
+  assert.equal(e.allInEUR,null,"Incomplete auction tax/fee structure must keep all-in UNKNOWN");
+  assert.equal(e.conversionKnown,false);
+}
+
+{
   const b=base();
   b.insuranceMonthlyEvidence="UNKNOWN";
   const c=Core.calcCandidate(b,settings,offer());

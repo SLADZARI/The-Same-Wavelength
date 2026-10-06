@@ -23,7 +23,8 @@ test("real offers -> price lineage -> decisions", async ({ page }) => {
   await expect(page.locator(".candidate-card")).toHaveCount(2);
 
   await page.getByRole("button", { name: "Сильные", exact: true }).click();
-  await expect(page.locator(".candidate-card")).toHaveCount(0);
+  await expect(page.locator(".candidate-card")).toHaveCount(1);
+  await expect(page.locator(".candidate-card")).toContainText("De Alm Kruiser");
 
   await page.getByRole("button", { name: "Все", exact: true }).click();
   await expect(page.locator(".candidate-card")).toHaveCount(4);

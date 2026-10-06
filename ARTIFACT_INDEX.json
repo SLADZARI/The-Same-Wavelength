@@ -25,9 +25,9 @@
     {
       "artifactId": "ilka.domain.boat-value-calculator",
       "documentType": "DOMAIN",
-      "currentVersion": "1.2",
+      "currentVersion": "1.3",
       "status": "APPROVED",
-      "path": "docs/domain/boat-value-calculator.v1.2.json",
+      "path": "docs/domain/boat-value-calculator.v1.3.json",
       "sourceSystem": "GIT",
       "authorityType": "APPROVED_AUTHORITY",
       "updated": "2026-10-06"
@@ -80,6 +80,16 @@
       "path": "reports/acquisition-radar-validation.v0.1.md",
       "sourceSystem": "GIT",
       "authorityType": "EVIDENCE",
+      "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.change-proposal.real-offer-g6-harmonization",
+      "documentType": "CHANGE_PROPOSAL",
+      "currentVersion": "1.0",
+      "status": "APPROVED",
+      "path": "docs/change-proposal/real-offer-g6-harmonization.v1.0.md",
+      "sourceSystem": "GIT",
+      "authorityType": "APPROVED_AUTHORITY",
       "updated": "2026-10-06"
     }
   ]

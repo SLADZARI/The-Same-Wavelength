@@ -4,13 +4,14 @@ project: ILKA Boat Value Calculator
 documentType: RESULT
 projectStage: BUILD
 gate: G2_DOMAIN_LOCK
-status: REVIEW
+status: SUPERSEDED
 version: 0.1
 updated: 2026-10-06
 owner: Modern Pilgrims
 sourceSystem: GIT
-authorityType: IMPLEMENTATION_AUTHORITY
+authorityType: HISTORY
 supersedes: —
+supersededBy: 0.2
 ---
 
 # Result — Calculator foundation and evidence intake

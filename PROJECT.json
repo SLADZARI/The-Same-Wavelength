@@ -9,10 +9,11 @@
     "APPROVED_STATE.json",
     "docs/product/boat-value-calculator.v1.0.md",
     "docs/decision/economic-baseline.v1.0.md",
-    "docs/domain/boat-value-calculator.v0.1.json",
+    "docs/domain/boat-value-calculator.v1.0.json",
     "results/calculator-foundation.v0.1.md",
     "evidence/marina-offers.v0.1.json",
-    "README.md"
+    "README.md",
+    "docs/research-v2-model.md"
   ],
   "authorityPointers": {
     "PRODUCT": "ilka.product.boat-value-calculator",
@@ -33,9 +34,9 @@
   },
   "activeIntegrationBranch": "feat/ilka-value-calculator",
   "currentGate": {
-    "gate": "G2_DOMAIN_LOCK",
+    "gate": "G5_BUILD",
     "status": "OPEN",
-    "reason": "Product purpose and economic baseline are approved. The project-specific domain model is DRAFT and must be reviewed before further semantic expansion."
+    "reason": "DOMAIN v1.0 is approved. Implement Boat Acquisition Radar v1 on the existing integration branch without changing approved semantics."
   },
   "implementation": {
     "entrypoint": "index.html",

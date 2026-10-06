@@ -1,3 +1,20 @@
+---
+artifactId: ilka.research.acquisition-liveaboard-model
+project: ILKA Boat Value Calculator
+documentType: RESEARCH
+projectStage: CLARITY
+gate: G2_DOMAIN_LOCK
+status: REVIEW
+version: 0.1
+updated: 2026-10-06
+owner: Modern Pilgrims
+sourceSystem: GIT
+authorityType: REFERENCE
+supersedes: —
+---
+
+> RESEARCH / REFERENCE: proposals and external claims in this document are not approved product/domain semantics unless promoted through an explicit Decision. External factual claims require source verification before they are used as evidence.
+
 # ILKA Boat/Home Acquisition Model — Research V2
 
 ## Executive premise

@@ -4,12 +4,12 @@
   "documentType": "DOMAIN",
   "projectStage": "CLARITY",
   "gate": "G2_DOMAIN_LOCK",
-  "status": "DRAFT",
+  "status": "SUPERSEDED",
   "version": "0.1",
   "updated": "2026-10-06",
   "owner": "Modern Pilgrims",
   "sourceSystem": "GIT",
-  "authorityType": "REFERENCE",
+  "authorityType": "HISTORY",
   "supersedes": null,
   "entities": {
     "BoatCandidate": {
@@ -141,5 +141,6 @@
   "reviewQuestions": [
     "Should monetization become part of this domain or remain a separate future DOMAIN extension?",
     "Should actual expense tracking reuse CostItem or introduce a separate runtime ledger only when implementation requires it?"
-  ]
+  ],
+  "supersededBy": "1.0"
 }

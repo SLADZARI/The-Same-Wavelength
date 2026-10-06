@@ -1,0 +1,255 @@
+{
+  "artifactId": "ilka.domain.boat-value-calculator",
+  "project": "ILKA Boat Value Calculator",
+  "documentType": "DOMAIN",
+  "projectStage": "DECISION",
+  "gate": "G2_DOMAIN_LOCK",
+  "status": "APPROVED",
+  "version": "1.0",
+  "updated": "2026-10-06",
+  "owner": "Modern Pilgrims",
+  "sourceSystem": "GIT",
+  "authorityType": "APPROVED_AUTHORITY",
+  "supersedes": "0.1",
+  "entities": {
+    "BoatCandidate": {
+      "meaning": "A distinct boat candidate being evaluated.",
+      "attributes": [
+        "candidateId",
+        "name",
+        "model",
+        "location",
+        "dimensions",
+        "material",
+        "propulsion",
+        "liveaboardFeatures",
+        "notes"
+      ]
+    },
+    "BoatOffer": {
+      "meaning": "A time-bound seller/market offer for one BoatCandidate. Price history belongs here and must not overwrite candidate identity.",
+      "attributes": [
+        "offerId",
+        "candidateId",
+        "observedAt",
+        "source",
+        "askingPrice",
+        "sellerCounterPrice",
+        "currency",
+        "included",
+        "conditions",
+        "status",
+        "comment"
+      ]
+    },
+    "MarinaOffer": {
+      "meaning": "A source-backed berth, liveaboard or wintering offer for a defined boat size and period.",
+      "attributes": [
+        "offerId",
+        "marinaName",
+        "location",
+        "observedAt",
+        "period",
+        "referenceBoat",
+        "availability",
+        "winterAfloat",
+        "liveaboardAllowed",
+        "pricing",
+        "utilities",
+        "facilities",
+        "access",
+        "conditions",
+        "source"
+      ]
+    },
+    "LogisticsOption": {
+      "meaning": "One feasible or rejected delivery/logistics option for a candidate.",
+      "attributes": [
+        "logisticsOptionId",
+        "candidateId",
+        "mode",
+        "feasible",
+        "route",
+        "estimatedCost",
+        "duration",
+        "assumptions",
+        "source"
+      ]
+    },
+    "RefitPlan": {
+      "meaning": "The costed work required to reach the chosen habitability/operability state. Mandatory work is separated from optional/custom work.",
+      "attributes": [
+        "refitPlanId",
+        "candidateId",
+        "items",
+        "monthsToHabitable",
+        "mandatoryCost",
+        "optionalCost",
+        "notes"
+      ]
+    },
+    "CostItem": {
+      "meaning": "A monetary input with original currency, timing and evidence/assumption status.",
+      "attributes": [
+        "costItemId",
+        "category",
+        "amount",
+        "currency",
+        "frequency",
+        "source",
+        "factLabel",
+        "notes"
+      ]
+    },
+    "GateAssessment": {
+      "meaning": "Hard decision gates that subjective scoring cannot override.",
+      "attributes": [
+        "gateAssessmentId",
+        "candidateId",
+        "legal",
+        "structural",
+        "logistics",
+        "habitability",
+        "insurance",
+        "evidenceRefs",
+        "notes"
+      ]
+    },
+    "Scenario": {
+      "meaning": "One evaluation composition linking a boat offer, marina offer, logistics option, refit plan, hard gates, FX assumptions and horizon.",
+      "attributes": [
+        "scenarioId",
+        "boatCandidateId",
+        "boatOfferId",
+        "marinaOfferId",
+        "logisticsOptionId",
+        "refitPlanId",
+        "gateAssessmentId",
+        "horizonMonths",
+        "fx",
+        "costItems"
+      ]
+    },
+    "EvaluationSnapshot": {
+      "meaning": "Derived decision metrics from one Scenario at one calculation state.",
+      "attributes": [
+        "snapshotId",
+        "scenarioId",
+        "calculatedAt",
+        "metrics",
+        "inputRefs"
+      ]
+    },
+    "EvidenceRef": {
+      "meaning": "Recoverable pointer/label describing where a material fact came from without copying private source content into public Git.",
+      "attributes": [
+        "sourceSystem",
+        "sourceType",
+        "sourceLabel",
+        "observedAt",
+        "privacyNote"
+      ]
+    }
+  },
+  "enums": {
+    "factLabel": [
+      "FACT",
+      "INFERENCE",
+      "PROPOSAL",
+      "DECISION",
+      "UNKNOWN"
+    ],
+    "offerStatus": [
+      "OBSERVED",
+      "CONTACTED",
+      "NEGOTIATING",
+      "REJECTED",
+      "ACCEPTED",
+      "WITHDRAWN",
+      "SOLD"
+    ],
+    "logisticsMode": [
+      "SEA",
+      "ROAD"
+    ],
+    "hardGateState": [
+      "UNKNOWN",
+      "PASS",
+      "FAIL"
+    ],
+    "marinaAvailability": [
+      "AVAILABLE",
+      "NOT_AVAILABLE",
+      "LAND_ONLY",
+      "UNKNOWN"
+    ],
+    "decisionState": [
+      "HOLD",
+      "WALK_AWAY",
+      "ECONOMIC_EVAL"
+    ]
+  },
+  "metrics": {
+    "acquisitionCost": "purchase + due diligence + closing/document costs",
+    "selectedLogisticsCost": "cost of the selected feasible logistics option",
+    "mandatoryRefitCost": "mandatory refit required before normal operation/move-in",
+    "overlapHousingCost": "rent/temporary housing paid while the boat is not yet habitable",
+    "costToHabitable": "acquisitionCost + selectedLogisticsCost + mandatoryRefitCost + overlapHousingCost",
+    "monthlyRunRate": "marina + insurance + maintenance reserve + utilities + heating + local fuel + communications + winter equivalent + misc",
+    "cashCost": "costToHabitable + monthlyRunRate × horizonMonths",
+    "netExpectedSaleProceeds": "expected resale value - selling costs",
+    "netQuickSaleProceeds": "quick-sale value - selling costs",
+    "economicCost": "cashCost - netExpectedSaleProceeds",
+    "downsideEconomicCost": "cashCost - netQuickSaleProceeds",
+    "equivalentHousingCostMonthly": "economicCost / horizonMonths",
+    "downsideHousingCostMonthly": "downsideEconomicCost / horizonMonths",
+    "deltaVsRent": "economicCost - rent alternative over the same horizon",
+    "downsideDeltaVsRent": "downsideEconomicCost - rent alternative over the same horizon",
+    "maxPurchaseCash": "budget over horizon - due diligence - logistics - refit - overlap housing - operating costs",
+    "maxPurchaseEconomic": "budget over horizon + netExpectedSaleProceeds - non-purchase costs - risk buffer",
+    "maxPurchaseVsRent": "rent alternative over horizon + netQuickSaleProceeds - non-purchase costs - risk buffer",
+    "walkAwayPrice": "budget over horizon + netQuickSaleProceeds - non-purchase costs - risk buffer",
+    "marginOfSafety": "walkAwayPrice - current asking price",
+    "valueScore": "weighted utility/object-quality score independent of price",
+    "valueIndex": "valueScore / economicCost in EUR thousands",
+    "payback": "capital-at-risk / monthly housing saving when housing saving is positive"
+  },
+  "gateRule": {
+    "fail": "If any hard gate is FAIL, decisionState = WALK_AWAY.",
+    "unknown": "If no gate is FAIL and at least one hard gate is UNKNOWN, decisionState = HOLD.",
+    "pass": "Only when all hard gates are PASS may the economics produce a buy/price recommendation."
+  },
+  "relations": [
+    "BoatCandidate has many BoatOffer",
+    "BoatCandidate has many LogisticsOption",
+    "BoatCandidate has many RefitPlan",
+    "BoatCandidate has GateAssessment",
+    "Scenario references one BoatCandidate and may reference one BoatOffer",
+    "Scenario may reference one MarinaOffer",
+    "Scenario references one selected LogisticsOption",
+    "Scenario references one RefitPlan",
+    "Scenario references one GateAssessment",
+    "Scenario has many CostItem",
+    "EvaluationSnapshot derives from one Scenario",
+    "EvidenceRef may support BoatOffer, MarinaOffer, LogisticsOption, RefitPlan, GateAssessment or CostItem"
+  ],
+  "aliases": {
+    "Landed cost": "costToHabitable when overlap housing is zero; deprecated as the primary KPI",
+    "Max buy @ budget": "maxPurchaseEconomic",
+    "Cash-only ceiling": "maxPurchaseCash",
+    "Max buy vs rent": "maxPurchaseVsRent",
+    "Monthly run-rate": "monthlyRunRate",
+    "12m economic": "economicCost"
+  },
+  "deprecated": {
+    "single resaleEUR as downside value": "Use expected resale and quick-sale value separately for base and downside views."
+  },
+  "deferred": [
+    "Tow/commercial freight logistics modes",
+    "Lifecycle component CAPEX schedule",
+    "Monte Carlo / probability distributions",
+    "Opportunity-cost discounting",
+    "Monetization/commercial scenarios",
+    "Actual-vs-budget ledger"
+  ]
+}

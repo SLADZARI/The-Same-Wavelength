@@ -25,19 +25,19 @@
     {
       "artifactId": "ilka.domain.boat-value-calculator",
       "documentType": "DOMAIN",
-      "currentVersion": "0.1",
-      "status": "DRAFT",
-      "path": "docs/domain/boat-value-calculator.v0.1.json",
+      "currentVersion": "1.0",
+      "status": "APPROVED",
+      "path": "docs/domain/boat-value-calculator.v1.0.json",
       "sourceSystem": "GIT",
-      "authorityType": "REFERENCE",
+      "authorityType": "APPROVED_AUTHORITY",
       "updated": "2026-10-06"
     },
     {
       "artifactId": "ilka.result.calculator-foundation",
       "documentType": "RESULT",
-      "currentVersion": "0.1",
-      "status": "REVIEW",
-      "path": "results/calculator-foundation.v0.1.md",
+      "currentVersion": "0.2",
+      "status": "DRAFT",
+      "path": "results/calculator-foundation.v0.2.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-10-06"
@@ -50,6 +50,16 @@
       "path": "evidence/marina-offers.v0.1.json",
       "sourceSystem": "GIT",
       "authorityType": "EVIDENCE",
+      "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.research.acquisition-liveaboard-model",
+      "documentType": "RESEARCH",
+      "currentVersion": "0.1",
+      "status": "REVIEW",
+      "path": "docs/research-v2-model.md",
+      "sourceSystem": "GIT",
+      "authorityType": "REFERENCE",
       "updated": "2026-10-06"
     }
   ]

@@ -8,8 +8,8 @@
   },
   "DOMAIN": {
     "artifactId": "ilka.domain.boat-value-calculator",
-    "version": "0.1",
-    "status": "DRAFT"
+    "version": "1.0",
+    "status": "APPROVED"
   },
   "ARCHITECTURE": null,
   "DESIGN": null,
@@ -26,6 +26,11 @@
     "Current apartment-cost baseline is 3100–3200 PLN/month; 3150 PLN is only the editable midpoint default.",
     "Primary target is an all-in economic burden not exceeding 1000 USD/month over the selected horizon.",
     "The initial evaluation horizon is 12 months.",
-    "Raw comments and offers are not Decisions until explicitly approved."
+    "Raw comments and offers are not Decisions until explicitly approved.",
+    "Price history is represented by BoatOffer and must not overwrite BoatCandidate identity.",
+    "Verified marina terms are represented by MarinaOffer and must retain evidence lineage.",
+    "Hard gates (legal, structural, logistics, habitability, insurance) cannot be overridden by subjective value scoring.",
+    "Base-case economics use expected resale; downside/walk-away calculations use quick-sale value.",
+    "Monetization remains outside the housing base case."
   ]
 }

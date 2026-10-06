@@ -315,13 +315,15 @@
       "amount": 5750,
       "currency": "EUR",
       "buyerPremium": {
-        "ratePct": 18
+        "ratePct": 18,
+        "evidenceState": "QUOTE"
       },
       "taxFees": [
         {
           "label": "VAT on buyer premium",
           "ratePct": 21,
-          "base": "PREMIUM"
+          "base": "PREMIUM",
+          "evidenceState": "QUOTE"
         }
       ],
       "derivedAllInPrice": 7002.35,
@@ -403,15 +405,24 @@
       "amount": 10000,
       "currency": "EUR",
       "buyerPremium": {
-        "ratePct": 12.5
+        "ratePct": 12.5,
+        "evidenceState": "QUOTE"
       },
-      "taxFees": [],
+      "taxFees": [
+        {
+          "label": "VAT / auction tax treatment",
+          "amount": null,
+          "ratePct": null,
+          "base": "PREMIUM",
+          "evidenceState": "UNKNOWN"
+        }
+      ],
       "derivedAllInPrice": null,
       "auctionEnd": "2026-11-10T18:00:00+01:00",
       "offerExpiry": null,
       "status": "OBSERVED",
       "conditions": "Starting bid; exact VAT/fee total not fully captured in fixture evidence.",
-      "comment": "Hard-fail control candidate; do not infer a final auction purchase price."
+      "comment": "Hard-fail control candidate. Premium is known; VAT/tax treatment is not fully captured, so derived all-in remains UNKNOWN."
     },
     {
       "offerId": "offer-motorboat1050-20261006",
@@ -425,13 +436,15 @@
       "amount": 5000,
       "currency": "EUR",
       "buyerPremium": {
-        "ratePct": 18
+        "ratePct": 18,
+        "evidenceState": "QUOTE"
       },
       "taxFees": [
         {
           "label": "VAT on buyer premium",
           "ratePct": 21,
-          "base": "PREMIUM"
+          "base": "PREMIUM",
+          "evidenceState": "QUOTE"
         }
       ],
       "derivedAllInPrice": 6089,

@@ -3,12 +3,12 @@
   "updated": "2026-10-06",
   "PRODUCT": {
     "artifactId": "ilka.product.boat-value-calculator",
-    "version": "1.0",
+    "version": "1.1",
     "status": "APPROVED"
   },
   "DOMAIN": {
     "artifactId": "ilka.domain.boat-value-calculator",
-    "version": "1.0",
+    "version": "1.1",
     "status": "APPROVED"
   },
   "ARCHITECTURE": null,
@@ -20,16 +20,28 @@
       "status": "APPROVED"
     }
   ],
+  "changeProposals": [
+    {
+      "artifactId": "ilka.change-proposal.acquisition-radar-liveability",
+      "version": "1.0",
+      "status": "APPROVED"
+    }
+  ],
   "protectedSemantics": [
     "Primary purpose: choose a liveaboard boat using total ownership economics, not listing price alone.",
     "Housing substitution is evaluated before monetization upside.",
     "Current apartment-cost baseline is 3100–3200 PLN/month; 3150 PLN is only the editable midpoint default.",
     "Primary target is an all-in economic burden not exceeding 1000 USD/month over the selected horizon.",
     "The initial evaluation horizon is 12 months.",
+    "At least two private cabins are required.",
+    "At least six sleeping/comfortable places are required.",
+    "Move-in must be possible immediately after acquisition/delivery; permanent installed heating is not required if safe temporary shore-powered heating is feasible.",
+    "DIY time is counted with an editable shadow rate and is not economically free.",
+    "LOCAL logistics is a first-class option when the boat is already near the intended home location.",
     "Raw comments and offers are not Decisions until explicitly approved.",
     "Price history is represented by BoatOffer and must not overwrite BoatCandidate identity.",
     "Verified marina terms are represented by MarinaOffer and must retain evidence lineage.",
-    "Hard gates (legal, structural, logistics, habitability, insurance) cannot be overridden by subjective value scoring.",
+    "Hard gates cannot be overridden by subjective value scoring.",
     "Base-case economics use expected resale; downside/walk-away calculations use quick-sale value.",
     "Monetization remains outside the housing base case."
   ]

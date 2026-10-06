@@ -4,13 +4,14 @@ project: ILKA Boat Value Calculator
 documentType: RESULT
 projectStage: BUILD
 gate: G5_BUILD
-status: DRAFT
+status: SUPERSEDED
 version: 0.2
 updated: 2026-10-06
 owner: Modern Pilgrims
 sourceSystem: GIT
-authorityType: IMPLEMENTATION_AUTHORITY
+authorityType: HISTORY
 supersedes: 0.1
+supersededBy: 0.3
 ---
 
 # Result — Boat Acquisition Radar v1

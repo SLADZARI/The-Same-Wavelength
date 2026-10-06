@@ -104,6 +104,7 @@ function sourceFromUrl(url){
 let state=load();
 let selectedId=state.boats[0]?.id;
 let marinaEvidence={status:"loading",offers:[],path:"",error:""};
+let candidateFilter="all";
 
 function boat(){return state.boats.find(x=>x.id===selectedId)||state.boats[0];}
 function calc(b=boat()){return Core.calcCandidate(b,state.settings);}
@@ -126,38 +127,97 @@ function renderSettings(){
     el.value=state.settings[k]??"";
     el.oninput=()=>{
       state.settings[k]=el.type==="number"?num(el.value):el.value;
-      save();renderTable();renderComputed();renderImprovementTotals();renderMarinaPresets();
+      save();renderScenarioSummary();renderTable();renderComputed();renderImprovementTotals();renderMarinaPresets();
     };
   });
 }
 
+function renderScenarioSummary(){
+  const el=$("#scenarioSummary"); if(!el)return;
+  const pln=Math.max(num(state.settings.plnPerEur),0.01);
+  const rentEUR=num(state.settings.rentPLN)/pln;
+  const budgetEUR=num(state.settings.budgetUSD)/Math.max(num(state.settings.usdPerEur),0.01);
+  el.innerHTML=[
+    ["База",escapeHtml(state.settings.targetLocation||"—")],
+    ["Аренда",money(rentEUR)+"/мес"],
+    ["Лимит",money(budgetEUR)+"/мес"],
+    ["Горизонт",num(state.settings.horizonMonths)+" мес"]
+  ].map(([a,b])=>`<div class="scenario-chip"><span>${a}</span><strong>${b}</strong></div>`).join("");
+}
+
+function candidateMatchesFilter(c){
+  if(candidateFilter==="strong") return ["BUY_ZONE","CONSIDER","NEGOTIATE"].includes(c.recommendationCode);
+  if(candidateFilter==="hold") return c.recommendationCode==="HOLD";
+  if(candidateFilter==="reject") return ["WALK_AWAY","WEAK"].includes(c.recommendationCode);
+  return true;
+}
+
+function gateCompact(c){
+  const vals=Object.values(c.gates);
+  if(vals.includes("FAIL")) return "hard fail";
+  const unknown=vals.filter(x=>x==="UNKNOWN").length;
+  if(unknown) return `${unknown} unknown`;
+  return "gates closed";
+}
+
 function renderTable(){
-  const table=$("#boatsTable");
+  const wrap=$("#candidateList"),stats=$("#portfolioStats"); if(!wrap)return;
   const priority={BUY_ZONE:0,CONSIDER:1,NEGOTIATE:2,HOLD:3,WEAK:4,WALK_AWAY:5};
-  const rows=state.boats.map(b=>({b,c:calc(b)})).sort((x,y)=>(priority[x.c.recommendationCode]??9)-(priority[y.c.recommendationCode]??9)||y.c.marginOfSafety-x.c.marginOfSafety);
-  table.innerHTML=`<thead><tr>
-    <th>Кандидат</th><th>Решение</th><th>Ask</th><th>Walk-away</th><th>Запас</th>
-    <th>Cost-to-Habitable</th><th>Downside / мес</th><th>Логистика</th><th>Жильё</th><th>DIY value</th>
-  </tr></thead><tbody></tbody>`;
-  const body=table.querySelector("tbody");
-  rows.forEach(({b,c})=>{
-    const tr=document.createElement("tr"); if(b.id===selectedId)tr.classList.add("selected");
+  const all=state.boats.map(b=>({b,c:calc(b)})).sort((x,y)=>(priority[x.c.recommendationCode]??9)-(priority[y.c.recommendationCode]??9)||y.c.marginOfSafety-x.c.marginOfSafety);
+  const rows=all.filter(x=>candidateMatchesFilter(x.c));
+  const strong=all.filter(x=>["BUY_ZONE","CONSIDER","NEGOTIATE"].includes(x.c.recommendationCode)).length;
+  const hold=all.filter(x=>x.c.recommendationCode==="HOLD").length;
+  const reject=all.filter(x=>["WALK_AWAY","WEAK"].includes(x.c.recommendationCode)).length;
+  if(stats) stats.innerHTML=`${all.length} всего<br>${strong} сильных · ${hold} hold · ${reject} отсев`;
+  if(!rows.length){
+    wrap.innerHTML='<div class="empty-state">В этом фильтре пока нет кандидатов.</div>';
+    return;
+  }
+  wrap.innerHTML=rows.map(({b,c})=>{
     const log=c.logistics.selected;
-    const layout=`${num(b.cabins)||"?"} кают · ${num(b.berths)||"?"} мест`;
-    tr.innerHTML=`
-      <td><b>${escapeHtml(b.name)}</b><br><small>${escapeHtml(b.location||"локация ?")} · ${escapeHtml(b.sourceSite||"источник ?")}</small></td>
-      <td><span class="tag ${c.recommendationClass}">${recommendationLabel(c)}</span></td>
-      <td>${money(num(b.purchaseEUR))}</td>
-      <td><b>${money(Math.max(0,c.walkAwayPrice))}</b></td>
-      <td class="${c.marginOfSafety>=0?"positive":"negative"}">${signed(c.marginOfSafety)}</td>
-      <td>${money(c.costToHabitable)}</td>
-      <td>${money(c.downsideHousingCostMonthly)}</td>
-      <td>${log?log.mode+" · "+money(log.cost):"?"}</td>
-      <td>${layout}<br><small>${c.gates.habitability}</small></td>
-      <td class="${c.improvements.net>=0?"positive":"negative"}">${signed(c.improvements.net)}</td>`;
-    tr.onclick=()=>{selectedId=b.id;renderAll();};
-    body.appendChild(tr);
+    const selected=b.id===selectedId?" selected":"";
+    const marginClass=c.marginOfSafety>=0?"positive":"negative";
+    return `<button type="button" class="candidate-card${selected}" data-candidate="${escapeHtml(b.id)}">
+      <div class="candidate-card-top">
+        <div><h3>${escapeHtml(b.name||"Кандидат")}</h3><div class="source">${escapeHtml(b.location||"локация ?")} · ${escapeHtml(b.sourceSite||"источник ?")}</div></div>
+        <span class="tag ${c.recommendationClass}">${recommendationLabel(c)}</span>
+      </div>
+      <div class="candidate-card-grid">
+        <div><span>Ask</span><strong>${money(num(b.purchaseEUR))}</strong></div>
+        <div><span>Walk-away</span><strong>${money(Math.max(0,c.walkAwayPrice))}</strong></div>
+        <div><span>Жильё</span><strong>${num(b.cabins)||"?"} кают · ${num(b.berths)||"?"} мест</strong></div>
+        <div><span>Логистика</span><strong>${log?log.mode+" · "+money(log.cost):"unknown"}</strong></div>
+      </div>
+      <div class="candidate-card-foot">
+        <span>${gateCompact(c)}</span>
+        <strong class="${marginClass}">${signed(c.marginOfSafety)}</strong>
+      </div>
+    </button>`;
+  }).join("");
+  wrap.querySelectorAll("[data-candidate]").forEach(el=>{
+    el.onclick=()=>{selectedId=el.dataset.candidate;renderAll();};
   });
+}
+
+function renderCandidateSnapshot(){
+  const b=boat(); if(!b)return;
+  const c=calc(b);
+  const fields=[
+    ["Каюты",num(b.cabins)||"?"],
+    ["Спальных",num(b.berths)||"?"],
+    ["Комфортно",num(b.comfortablePeople)||"?"],
+    ["Заселение",b.moveInState||"UNKNOWN"],
+    ["Корпус",b.material||"UNKNOWN"],
+    ["Габарит",num(b.lengthM)?`${num(b.lengthM).toFixed(1)} × ${num(b.beamM).toFixed(2)} м`:"?"]
+  ];
+  $("#candidateSnapshot").innerHTML=fields.map(([a,v])=>`<div class="snapshot-item"><span>${a}</span><strong>${escapeHtml(v)}</strong></div>`).join("");
+  const meta=$("#candidateSourceMeta");
+  if(meta) meta.textContent=[b.sellerType,b.sourceSite,b.offerObservedAt].filter(Boolean).join(" · ");
+  const link=$("#openListingBtn");
+  if(link){
+    if(b.url){link.href=b.url;link.classList.remove("disabled");link.removeAttribute("aria-disabled");}
+    else{link.removeAttribute("href");link.classList.add("disabled");link.setAttribute("aria-disabled","true");}
+  }
 }
 
 function renderEditor(){
@@ -173,9 +233,10 @@ function renderEditor(){
       else b[k]=el.value;
       if(k==="name") $("#boatTitle").textContent=b.name||"Кандидат";
       if(k==="url"&&!b.sourceSite) b.sourceSite=sourceFromUrl(b.url);
-      save();renderTable();renderComputed();renderLogisticsSummary();renderImprovementTotals();renderMarinaPresets();
+      save();renderCandidateSnapshot();renderTable();renderComputed();renderLogisticsSummary();renderImprovementTotals();renderMarinaPresets();
     };
   });
+  renderCandidateSnapshot();
   renderImprovementList();
   renderScoreInputs();
 }
@@ -253,6 +314,24 @@ function gateBadge(name,value){
   const cls=value==="PASS"?"green":value==="FAIL"?"red":"yellow";
   return `<span class="gate-badge ${cls}"><b>${name}</b> ${value}</span>`;
 }
+
+function renderDecisionReasons(b,c){
+  const el=$("#decisionReasons"); if(!el)return;
+  const labels={legal:"Документы",structural:"Корпус",logistics:"Логистика",habitability:"Жильё",insurance:"Страхование"};
+  const reasons=[];
+  Object.entries(c.gates).forEach(([k,v])=>{
+    if(v==="FAIL") reasons.push(["red",`${labels[k]}: hard gate FAIL — высокий score не может это отменить.`]);
+    else if(v==="UNKNOWN") reasons.push(["yellow",`${labels[k]}: нужны подтверждённые данные.`]);
+  });
+  if(!reasons.length){
+    if(c.marginOfSafety<0) reasons.push(["yellow",`Ask выше walk-away на ${money(Math.abs(c.marginOfSafety))}. Нужен торг ниже потолка.`]);
+    if(c.downsideHousingCostMonthly>c.budgetEUR) reasons.push(["yellow",`Downside ${money(c.downsideHousingCostMonthly)}/мес выше лимита ${money(c.budgetEUR)}/мес.`]);
+    if(c.downsideDeltaVsRent>0) reasons.push(["yellow",`Downside за горизонт хуже аренды на ${money(c.downsideDeltaVsRent)}.`]);
+    if(!reasons.length) reasons.push(["green","Hard gates закрыты, downside укладывается в заданные экономические ограничения."]);
+  }
+  el.innerHTML=reasons.slice(0,5).map(([cls,text])=>`<div class="reason ${cls}"><i></i><span>${text}</span></div>`).join("");
+}
+
 function renderComputed(){
   const b=boat(); if(!b)return; const c=calc(b);
   const v=$("#verdict");
@@ -266,25 +345,18 @@ function renderComputed(){
     gateBadge("Legal",c.gates.legal),gateBadge("Hull",c.gates.structural),
     gateBadge("Logistics",c.gates.logistics),gateBadge("Liveability",c.gates.habitability),gateBadge("Insurance",c.gates.insurance)
   ].join("");
+  renderDecisionReasons(b,c);
 
   const log=c.logistics.selected;
   const metrics=[
-    ["Цена объявления",money(num(b.purchaseEUR)),b.sourceSite||"источник не указан"],
-    ["Walk-away",money(Math.max(0,c.walkAwayPrice)),"максимум по downside-бюджету"],
-    ["Запас безопасности",signed(c.marginOfSafety),c.marginOfSafety>=0?"ask ниже потолка":"нужен торг / отбой"],
-    ["Cost-to-Habitable",money(c.costToHabitable),"до пригодного жилого актива"],
-    ["Downside / мес",money(c.downsideHousingCostMonthly),`лимит ≈ ${money(c.budgetEUR)}`],
-    ["Base / мес",money(c.equivalentHousingCostMonthly),"с expected resale"],
-    ["Downside Δ vs rent",signed(c.downsideDeltaVsRent),`аренда ${money(c.rentAlternative)} / горизонт`],
-    ["Run-rate / мес",money(c.monthly),"марина + эксплуатация"],
-    ["Логистика",log?money(log.cost):"—",log?log.mode:"нет подтверждённого пути"],
-    ["Обязательный ремонт",money(c.mandatoryRefit),"до заселения"],
-    ["DIY shadow",money(c.improvements.shadowEUR),`${c.improvements.hours.toFixed(0)} ч × ${num(state.settings.diyShadowRatePLN).toFixed(2)} PLN`],
-    ["Value from work",signed(c.improvements.net),`uplift ${money(c.improvements.uplift)}`],
-    ["Expected sale",money(c.netExpectedSale),"net after selling costs"],
-    ["Quick-sale",money(c.netQuickSale),"downside liquidation"],
-    ["Max price vs rent",money(Math.max(0,c.maxPurchaseVsRent)),"чтобы downside не проиграл аренде"],
-    ["Quality",c.score.toFixed(0)+"/100",`Value index ${c.valueIndex.toFixed(1)}`]
+    ["Walk-away",money(Math.max(0,c.walkAwayPrice)),"downside ceiling"],
+    ["Margin",signed(c.marginOfSafety),c.marginOfSafety>=0?"ниже потолка":"торг / отбой"],
+    ["Cost-to-Habitable",money(c.costToHabitable),"до жилого актива"],
+    ["Downside / мес",money(c.downsideHousingCostMonthly),`лимит ${money(c.budgetEUR)}`],
+    ["Run-rate",money(c.monthly),"/ месяц"],
+    ["Логистика",log?money(log.cost):"—",log?log.mode:"путь unknown"],
+    ["Quick-sale",money(c.netQuickSale),"net downside"],
+    ["DIY value",signed(c.improvements.net),`${c.improvements.hours.toFixed(0)} ч`]
   ];
   $("#metrics").innerHTML=metrics.map(([a,bv,sm])=>`<div class="metric"><span>${a}</span><strong>${bv}</strong><small>${sm}</small></div>`).join("");
   drawRadar(b);
@@ -377,8 +449,14 @@ function renderMarinaPresets(){
 }
 
 function renderAll(editor=true){
-  renderSettings();renderTable();if(editor)renderEditor();renderComputed();renderLogisticsSummary();renderImprovementTotals();renderMarinaPresets();
+  renderSettings();renderScenarioSummary();renderTable();if(editor)renderEditor();renderComputed();renderLogisticsSummary();renderImprovementTotals();renderMarinaPresets();
 }
+
+$$("[data-filter]").forEach(btn=>btn.onclick=()=>{
+  candidateFilter=btn.dataset.filter||"all";
+  $$("[data-filter]").forEach(x=>x.classList.toggle("active",x===btn));
+  renderTable();
+});
 
 $$(".tab").forEach(t=>t.onclick=()=>{
   $$(".tab").forEach(x=>x.classList.remove("active"));$$(".tab-content").forEach(x=>x.classList.remove("active"));

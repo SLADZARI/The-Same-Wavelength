@@ -46,10 +46,19 @@
     },0);
   }
 
+  function offerFeesComplete(o){
+    if(!o) return false;
+    const premium=o.buyerPremium;
+    if(premium && typeof premium==="object" && premium.evidenceState==="UNKNOWN") return false;
+    const fees=Array.isArray(o.taxFees)?o.taxFees:[];
+    if(fees.some(f=>f?.evidenceState==="UNKNOWN")) return false;
+    return !fees.some(f=>maybeNum(f?.amount)===null && maybeNum(f?.ratePct)===null);
+  }
+
   function offerAllInOriginal(o){
     if(!o) return null;
     if(maybeNum(o.derivedAllInPrice)!==null) return num(o.derivedAllInPrice);
-    if(maybeNum(o.amount)===null) return null;
+    if(maybeNum(o.amount)===null || !offerFeesComplete(o)) return null;
     const premium=buyerPremiumAmount(o);
     return num(o.amount)+premium+taxFeesAmount(o,premium);
   }
@@ -273,7 +282,7 @@
   }
 
   return {
-    num,maybeNum,toEUR,buyerPremiumAmount,taxFeesAmount,offerAllInOriginal,offerEconomics,
+    num,maybeNum,toEUR,buyerPremiumAmount,taxFeesAmount,offerFeesComplete,offerAllInOriginal,offerEconomics,
     habitabilityGate,logistics,improvementTotals,criticalCostUnknowns,calcCandidate
   };
 });

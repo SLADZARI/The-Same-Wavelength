@@ -16,6 +16,7 @@
   <div class="scenario-head" id="scenarioSummary"></div>
   <div class="top-actions">
     <button id="newBoatBtn">+ Кандидат</button>
+    <button id="loadFixturesBtn" class="secondary" disabled>Fixtures…</button>
     <button id="exportBtn" class="secondary">Экспорт</button>
     <label class="button secondary file-label">Импорт<input id="importInput" type="file" accept=".json" /></label>
   </div>
@@ -89,17 +90,21 @@
       </nav>
 
       <div id="tab-offer" class="tab-content active">
-        <h3>Источник предложения</h3>
+        <h3>Кандидат</h3>
         <div class="grid three">
-          <label>Название / модель<input data-field="name" type="text"></label>
-          <label>Сайт / источник<input data-field="sourceSite" type="text" placeholder="OLX / Scanboat / broker / ..."></label>
-          <label>Дата цены<input data-field="offerObservedAt" type="date"></label>
-          <label>Продавец<select data-field="sellerType"><option>UNKNOWN</option><option>PRIVATE</option><option>BROKER</option><option>DEALER</option><option>AUCTION</option><option>OTHER</option></select></label>
+          <label>Название<input data-field="name" type="text"></label>
+          <label>Модель<input data-field="model" type="text"></label>
           <label>Локация лодки<input data-field="location" type="text" placeholder="Gdańsk, PL"></label>
-          <label>Цена / текущая ставка, €<input data-field="purchaseEUR" type="number" min="0"></label>
-          <label class="span-three">Ссылка<input data-field="url" type="url"></label>
-          <label class="span-three">Комментарий к предложению<textarea data-field="offerComment" rows="3"></textarea></label>
         </div>
+
+        <div class="offer-section-head">
+          <h3>Current offer</h3>
+          <button id="addOfferBtn" type="button" class="secondary">+ Price observation</button>
+        </div>
+        <div id="currentOfferSummary" class="candidate-snapshot"></div>
+        <div id="currentOfferEditor"></div>
+        <h3>Price history</h3>
+        <div id="offerHistory" class="offer-history"></div>
 
         <h3>Жилой минимум</h3>
         <div class="grid four">
@@ -120,6 +125,7 @@
           <label>Мотор<select data-field="engineStatus"><option value="unknown">Неизвестно</option><option value="running">Ходовой</option><option value="minor">Мелкий ремонт</option><option value="major">Серьёзный ремонт</option><option value="dead">Не работает</option></select></label>
           <label>Мощность, hp<input data-field="engineHP" type="number"></label>
           <label>Расход, л/ч<input data-field="fuelBurnLPH" type="number" step="0.1"></label>
+          <label>Расход — evidence<select data-field="fuelBurnEvidence"><option>UNKNOWN</option><option>ESTIMATE</option><option>QUOTE</option><option>ACTUAL</option></select></label>
         </div>
 
         <h3>Hard gates</h3>
@@ -133,15 +139,16 @@
       <div id="tab-logistics" class="tab-content">
         <div class="compare-callout four" id="logisticsSummary"></div>
         <h3>LOCAL — лодка уже рядом</h3>
-        <div class="grid three">
-          <label class="check"><input data-field="localFeasible" type="checkbox"> LOCAL возможен</label>
+        <div class="grid four">
+          <label>Feasibility<select data-field="localFeasibility"><option>UNKNOWN</option><option>PASS</option><option>FAIL</option></select></label>
           <label>Локальная доставка / спуск, €<input data-field="localLogisticsEUR" type="number"></label>
+          <label>Cost evidence<select data-field="localLogisticsEvidence"><option>UNKNOWN</option><option>ESTIMATE</option><option>QUOTE</option><option>ACTUAL</option></select></label>
           <label class="check danger-check"><input data-field="logisticsImpossible" type="checkbox"> Подтверждено: доставить невозможно</label>
         </div>
 
         <h3>SEA — своим ходом</h3>
         <div class="grid four">
-          <label class="check"><input data-field="selfPropFeasible" type="checkbox"> SEA возможен</label>
+          <label>Feasibility<select data-field="seaFeasibility"><option>UNKNOWN</option><option>PASS</option><option>FAIL</option></select></label>
           <label>Дистанция, nm<input data-field="seaDistanceNm" type="number"></label>
           <label>Крейсер, kn<input data-field="cruiseKn" type="number" step="0.1"></label>
           <label>Коэфф. времени<input data-field="seaTimeFactor" type="number" step="0.05"></label>
@@ -152,36 +159,61 @@
           <label>Дорога экипажа, €<input data-field="crewTravelEUR" type="number"></label>
           <label>Подготовка, €<input data-field="seaPrepEUR" type="number"></label>
           <label>Резерв, €<input data-field="seaContingencyEUR" type="number"></label>
+          <label>Fuel evidence<select data-field="fuelBurnEvidence"><option>UNKNOWN</option><option>ESTIMATE</option><option>QUOTE</option><option>ACTUAL</option></select></label>
         </div>
 
         <h3>ROAD — перевозка</h3>
         <div class="grid four">
-          <label class="check"><input data-field="roadFeasible" type="checkbox"> ROAD возможен</label>
+          <label>Feasibility<select data-field="roadFeasibility"><option>UNKNOWN</option><option>PASS</option><option>FAIL</option></select></label>
           <label>Перевозчик, €<input data-field="roadTransportEUR" type="number"></label>
+          <label>Transport evidence<select data-field="roadTransportEvidence"><option>UNKNOWN</option><option>ESTIMATE</option><option>QUOTE</option><option>ACTUAL</option></select></label>
+          <label>Transport height, м<input data-field="transportHeightM" type="number" step="0.05"></label>
           <label>Кран погрузки, €<input data-field="loadingCraneEUR" type="number"></label>
+          <label>Loading crane evidence<select data-field="loadingCraneEvidence"><option>UNKNOWN</option><option>ESTIMATE</option><option>QUOTE</option><option>ACTUAL</option></select></label>
           <label>Кран/спуск, €<input data-field="unloadingCraneEUR" type="number"></label>
+          <label>Unloading evidence<select data-field="unloadingCraneEvidence"><option>UNKNOWN</option><option>ESTIMATE</option><option>QUOTE</option><option>ACTUAL</option></select></label>
+          <label>Crane lift weight, т<input data-field="craneLiftWeightT" type="number" step="0.1"></label>
+          <label>Dismantling<select data-field="dismantlingRequired"><option>UNKNOWN</option><option>YES</option><option>NO</option></select></label>
           <label>Permits / escort, €<input data-field="permitsEscortEUR" type="number"></label>
           <label>Подготовка, €<input data-field="roadPrepEUR" type="number"></label>
           <label>Резерв, €<input data-field="roadContingencyEUR" type="number"></label>
+        </div>
+
+        <h3>TOW — буксировка</h3>
+        <div class="grid four">
+          <label>Feasibility<select data-field="towFeasibility"><option>UNKNOWN</option><option>PASS</option><option>FAIL</option></select></label>
+          <label>Буксировка, €<input data-field="towCostEUR" type="number"></label>
+          <label>Cost evidence<select data-field="towCostEvidence"><option>UNKNOWN</option><option>ESTIMATE</option><option>QUOTE</option><option>ACTUAL</option></select></label>
+          <label>Подготовка, €<input data-field="towPrepEUR" type="number"></label>
+          <label>Резерв, €<input data-field="towContingencyEUR" type="number"></label>
         </div>
       </div>
 
       <div id="tab-movein" class="tab-content">
         <p class="note">Здесь только то, без чего нельзя безопасно заселиться / нормально эксплуатировать. Косметика, solar, батареи и упаковка — во вкладке «После заселения».</p>
-        <div class="grid three">
+        <div class="grid four">
           <label>Survey / диагностика, €<input data-field="dueDiligenceEUR" type="number"></label>
+          <label>Survey evidence<select data-field="dueDiligenceEvidence"><option>UNKNOWN</option><option>ESTIMATE</option><option>QUOTE</option><option>ACTUAL</option></select></label>
           <label>Документы / closing, €<input data-field="closingDocsEUR" type="number"></label>
+          <label>Closing evidence<select data-field="closingDocsEvidence"><option>UNKNOWN</option><option>ESTIMATE</option><option>QUOTE</option><option>ACTUAL</option></select></label>
           <label>Корпус до заселения, €<input data-field="hullRefitEUR" type="number"></label>
+          <label>Hull evidence<select data-field="hullRefitEvidence"><option>UNKNOWN</option><option>ESTIMATE</option><option>QUOTE</option><option>ACTUAL</option></select></label>
           <label>Механика до заселения, €<input data-field="mechanicalRefitEUR" type="number"></label>
+          <label>Mechanical evidence<select data-field="mechanicalRefitEvidence"><option>UNKNOWN</option><option>ESTIMATE</option><option>QUOTE</option><option>ACTUAL</option></select></label>
           <label>Безопасность, €<input data-field="safetyRefitEUR" type="number"></label>
+          <label>Safety evidence<select data-field="safetyRefitEvidence"><option>UNKNOWN</option><option>ESTIMATE</option><option>QUOTE</option><option>ACTUAL</option></select></label>
           <label>Минимум интерьера, €<input data-field="moveInInteriorEUR" type="number"></label>
-          <label>Стартовый резерв, €<input data-field="initialReserveEUR" type="number"></label>
+          <label>Interior evidence<select data-field="moveInInteriorEvidence"><option>UNKNOWN</option><option>ESTIMATE</option><option>QUOTE</option><option>ACTUAL</option></select></label>
+          <label>Emergency Reserve, €<input data-field="emergencyReserveEUR" type="number"></label>
           <label>Перекрытие аренды, мес<input data-field="overlapRentMonths" type="number" step="0.1"></label>
           <label>Yard/storage на ремонте, €<input data-field="yardStorageDuringRefitEUR" type="number"></label>
           <label>Прочее временное жильё, €<input data-field="temporaryHousingEUR" type="number"></label>
           <label>Ожидаемая продажа, €<input data-field="expectedResaleEUR" type="number"></label>
+          <label>Expected resale evidence<select data-field="expectedResaleEvidence"><option>UNKNOWN</option><option>ESTIMATE</option><option>QUOTE</option><option>ACTUAL</option></select></label>
           <label>Quick-sale, €<input data-field="quickSaleEUR" type="number"></label>
+          <label>Quick-sale evidence<select data-field="quickSaleEvidence"><option>UNKNOWN</option><option>ESTIMATE</option><option>QUOTE</option><option>ACTUAL</option></select></label>
           <label>Selling costs, €<input data-field="sellingCostsEUR" type="number"></label>
+          <label>Selling evidence<select data-field="sellingCostsEvidence"><option>UNKNOWN</option><option>ESTIMATE</option><option>QUOTE</option><option>ACTUAL</option></select></label>
           <label>Risk buffer, €<input data-field="riskBufferEUR" type="number"></label>
         </div>
       </div>
@@ -207,7 +239,9 @@
         <h3>Run-rate</h3>
         <div class="grid three">
           <label>Марина, €/мес<input data-field="marinaMonthlyEUR" type="number"></label>
+          <label>Marina evidence<select data-field="marinaMonthlyEvidence"><option>UNKNOWN</option><option>ESTIMATE</option><option>QUOTE</option><option>ACTUAL</option></select></label>
           <label>Страховка<input data-field="insuranceMonthlyEUR" type="number"></label>
+          <label>Insurance evidence<select data-field="insuranceMonthlyEvidence"><option>UNKNOWN</option><option>ESTIMATE</option><option>QUOTE</option><option>ACTUAL</option></select></label>
           <label>ТО / ремонты резерв<input data-field="maintenanceMonthlyEUR" type="number"></label>
           <label>Электричество<input data-field="electricityMonthlyEUR" type="number"></label>
           <label>Отопление / газ<input data-field="heatingMonthlyEUR" type="number"></label>

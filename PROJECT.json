@@ -1,0 +1,57 @@
+{
+  "projectId": "ilka-boat-value-calculator",
+  "projectName": "ILKA Boat Value Calculator",
+  "canonicalRepository": "SLADZARI/The-Same-Wavelength",
+  "defaultBranch": "main",
+  "projectStage": "BUILD",
+  "readFirst": [
+    "ARTIFACT_INDEX.json",
+    "APPROVED_STATE.json",
+    "docs/product/boat-value-calculator.v1.0.md",
+    "docs/decision/economic-baseline.v1.0.md",
+    "docs/domain/boat-value-calculator.v0.1.json",
+    "results/calculator-foundation.v0.1.md",
+    "evidence/marina-offers.v0.1.json",
+    "README.md"
+  ],
+  "authorityPointers": {
+    "PRODUCT": "ilka.product.boat-value-calculator",
+    "DOMAIN": "ilka.domain.boat-value-calculator",
+    "DECISION": [
+      "ilka.decision.economic-baseline"
+    ]
+  },
+  "protectedAreas": [
+    "Budget baseline and housing-first economics",
+    "Metric meanings once approved",
+    "Evidence provenance and offer history"
+  ],
+  "currentResult": {
+    "artifactId": "ilka.result.calculator-foundation",
+    "path": "results/calculator-foundation.v0.1.md",
+    "branch": "feat/ilka-value-calculator"
+  },
+  "activeIntegrationBranch": "feat/ilka-value-calculator",
+  "currentGate": {
+    "gate": "G2_DOMAIN_LOCK",
+    "status": "OPEN",
+    "reason": "Product purpose and economic baseline are approved. The project-specific domain model is DRAFT and must be reviewed before further semantic expansion."
+  },
+  "implementation": {
+    "entrypoint": "index.html",
+    "runtime": "static browser application",
+    "localState": "localStorage",
+    "durableDataRule": "localStorage is working state only; verified offers and price history must be promoted to Git EVIDENCE artifacts."
+  },
+  "evidenceIntake": {
+    "githubIssue": 2,
+    "url": "https://github.com/SLADZARI/The-Same-Wavelength/issues/2"
+  },
+  "doNotInfer": [
+    "Do not treat default calculator assumptions as market quotes.",
+    "Do not treat GitHub comments as approved Decisions.",
+    "Do not overwrite historical prices or offers when a newer quote arrives.",
+    "Do not copy private email bodies, personal phone numbers or private addresses into this public repository.",
+    "Do not include monetization income in the base housing viability case unless a separate approved scenario explicitly enables it."
+  ]
+}

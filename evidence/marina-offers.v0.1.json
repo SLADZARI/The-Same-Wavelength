@@ -1,0 +1,208 @@
+{
+  "artifactId": "ilka.research.marina-offers",
+  "project": "ILKA Boat Value Calculator",
+  "documentType": "RESEARCH",
+  "projectStage": "CLARITY",
+  "gate": "G2_DOMAIN_LOCK",
+  "status": "REVIEW",
+  "version": "0.1",
+  "updated": "2026-10-06",
+  "owner": "Modern Pilgrims",
+  "sourceSystem": "GIT",
+  "authorityType": "EVIDENCE",
+  "supersedes": null,
+  "evidencePolicy": "Commercial facts are normalized from private source messages. Raw private email bodies and personal contact details are intentionally not copied into this public repository.",
+  "referenceBoat": {
+    "model": "Marina 95",
+    "locationContext": "Finland",
+    "lengthM": 9.5,
+    "beamM": 3.16,
+    "draftM": 1.45,
+    "propulsion": "diesel",
+    "factLabel": "FACT",
+    "source": {
+      "sourceSystem": "EXTERNAL",
+      "sourceType": "USER_AND_EMAIL_CONTEXT",
+      "sourceLabel": "Marina wintering inquiries dated 2026-10-02 and 2026-10-06"
+    }
+  },
+  "offers": [
+    {
+      "offerId": "marina-offer.tamka.winter-2026-2027.2026-10-06",
+      "marinaName": "Tamka",
+      "location": "Gdańsk, Poland",
+      "observedAt": "2026-10-06",
+      "factLabel": "FACT",
+      "availability": "AVAILABLE",
+      "winterAfloat": true,
+      "liveaboardAllowed": true,
+      "periodLabel": "November 2026 through April 2027",
+      "pricing": {
+        "baseTotalPln": 3401,
+        "referenceLengthM": 9.5,
+        "condition": "Quoted total applies if the tariff does not change after New Year."
+      },
+      "utilities": {
+        "electricity": "metered; settled monthly",
+        "water": "metered; settled monthly"
+      },
+      "facilities": {
+        "kitchen": "Monday–Friday 08:00–16:00",
+        "wcPlnPerUse": 5,
+        "showerPlnPerUse": 10
+      },
+      "access": {
+        "mastRemovalRequired": false
+      },
+      "reservation": {
+        "requiredDocument": "boat registration certificate shown after arrival",
+        "deposit": "UNKNOWN"
+      },
+      "source": {
+        "sourceSystem": "EXTERNAL",
+        "sourceType": "EMAIL",
+        "sourceLabel": "Direct Tamka reply dated 2026-10-06",
+        "privacyNote": "Raw message retained outside public Git."
+      }
+    },
+    {
+      "offerId": "marina-offer.sienna-grobla.winter-2026-2027.2026-10-06",
+      "marinaName": "Sienna Grobla",
+      "location": "Gdańsk, Poland",
+      "observedAt": "2026-10-06",
+      "factLabel": "FACT",
+      "availability": "AVAILABLE",
+      "winterAfloat": true,
+      "liveaboardAllowed": true,
+      "period": {
+        "from": "2026-11-01",
+        "to": "2027-04-30"
+      },
+      "pricing": {
+        "ratePlnPerMeterPerDay": 2,
+        "referenceLengthM": 9.5,
+        "quotedDailyPlnForReferenceBoat": 19,
+        "derivedDaysInclusive": 181,
+        "derivedBaseTotalPln": 3439,
+        "derivedTotalFactLabel": "INFERENCE"
+      },
+      "utilities": {
+        "electricity": "extra; price UNKNOWN",
+        "water": "extra; price UNKNOWN"
+      },
+      "source": {
+        "sourceSystem": "EXTERNAL",
+        "sourceType": "EMAIL",
+        "sourceLabel": "Direct Sienna Grobla reply dated 2026-10-06",
+        "privacyNote": "Raw message retained outside public Git."
+      }
+    },
+    {
+      "offerId": "marina-response.zabi-kruk.winter-2026-2027.2026-10-06",
+      "marinaName": "Żabi Kruk",
+      "location": "Gdańsk, Poland",
+      "observedAt": "2026-10-06",
+      "factLabel": "FACT",
+      "availability": "NOT_AVAILABLE",
+      "winterAfloat": false,
+      "reason": "Basin freezes in winter.",
+      "suggestedAlternative": "Szafarnia",
+      "source": {
+        "sourceSystem": "EXTERNAL",
+        "sourceType": "EMAIL",
+        "sourceLabel": "Direct Żabi Kruk reply dated 2026-10-06",
+        "privacyNote": "Raw message retained outside public Git."
+      }
+    },
+    {
+      "offerId": "marina-response.elblag.winter-2026-2027.2026-10-06",
+      "marinaName": "Jachtklub Elbląg",
+      "location": "Elbląg, Poland",
+      "observedAt": "2026-10-06",
+      "factLabel": "FACT",
+      "availability": "LAND_ONLY",
+      "winterAfloat": false,
+      "period": {
+        "from": "2026-11-01",
+        "to": "2027-04-30"
+      },
+      "pricing": {
+        "landStorageTotalPln": 4200,
+        "months": 6,
+        "referenceLengthM": 9.5
+      },
+      "conditions": [
+        "Wheeled cradle required for yard storage.",
+        "Crane available for marina clients.",
+        "Mast may be stored in the workshop."
+      ],
+      "accommodation": "Separate on-site guest rooms are available; price UNKNOWN.",
+      "source": {
+        "sourceSystem": "EXTERNAL",
+        "sourceType": "EMAIL",
+        "sourceLabel": "Direct Jachtklub Elbląg reply dated 2026-10-06",
+        "privacyNote": "Raw message retained outside public Git."
+      }
+    },
+    {
+      "offerId": "marina-response.dabie.winter-2026-2027.2026-10-05",
+      "marinaName": "Marina Dąbie",
+      "location": "Szczecin, Poland",
+      "observedAt": "2026-10-05",
+      "factLabel": "FACT",
+      "availability": "NOT_AVAILABLE",
+      "reason": "No free places.",
+      "source": {
+        "sourceSystem": "EXTERNAL",
+        "sourceType": "EMAIL",
+        "sourceLabel": "Direct Marina Dąbie reply dated 2026-10-05",
+        "privacyNote": "Raw message retained outside public Git."
+      }
+    },
+    {
+      "offerId": "marina-response.blotnik.winter-2026-2027.2026-10-06",
+      "marinaName": "Marina Błotnik",
+      "location": "Błotnik, Poland",
+      "observedAt": "2026-10-06",
+      "factLabel": "FACT",
+      "availability": "UNKNOWN",
+      "status": "WAITING",
+      "nextStep": "Marina requested a phone number so the bosman can contact the inquirer.",
+      "pricing": "UNKNOWN",
+      "source": {
+        "sourceSystem": "EXTERNAL",
+        "sourceType": "EMAIL",
+        "sourceLabel": "Direct Marina Błotnik reply dated 2026-10-06",
+        "privacyNote": "Raw message retained outside public Git."
+      }
+    }
+  ],
+  "waitingForReply": [
+    {
+      "marinaName": "Nabrzeże Miejskie Gryfino",
+      "inquiryDate": "2026-10-06",
+      "factLabel": "FACT"
+    },
+    {
+      "marinaName": "Marina Trzebież",
+      "inquiryDate": "2026-10-06",
+      "factLabel": "FACT"
+    },
+    {
+      "marinaName": "Marina Yacht Park",
+      "location": "Gdynia, Poland",
+      "inquiryDate": "2026-10-06",
+      "factLabel": "FACT"
+    },
+    {
+      "marinaName": "NCŻ / AWF Gdańsk",
+      "inquiryDate": "2026-10-06",
+      "factLabel": "FACT"
+    },
+    {
+      "marinaName": "Marina Gdańsk",
+      "inquiryDate": "2026-10-06",
+      "factLabel": "FACT"
+    }
+  ]
+}

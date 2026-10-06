@@ -1,0 +1,31 @@
+{
+  "project": "ILKA Boat Value Calculator",
+  "updated": "2026-10-06",
+  "PRODUCT": {
+    "artifactId": "ilka.product.boat-value-calculator",
+    "version": "1.0",
+    "status": "APPROVED"
+  },
+  "DOMAIN": {
+    "artifactId": "ilka.domain.boat-value-calculator",
+    "version": "0.1",
+    "status": "DRAFT"
+  },
+  "ARCHITECTURE": null,
+  "DESIGN": null,
+  "decisions": [
+    {
+      "artifactId": "ilka.decision.economic-baseline",
+      "version": "1.0",
+      "status": "APPROVED"
+    }
+  ],
+  "protectedSemantics": [
+    "Primary purpose: choose a liveaboard boat using total ownership economics, not listing price alone.",
+    "Housing substitution is evaluated before monetization upside.",
+    "Current apartment-cost baseline is 3100–3200 PLN/month; 3150 PLN is only the editable midpoint default.",
+    "Primary target is an all-in economic burden not exceeding 1000 USD/month over the selected horizon.",
+    "The initial evaluation horizon is 12 months.",
+    "Raw comments and offers are not Decisions until explicitly approved."
+  ]
+}

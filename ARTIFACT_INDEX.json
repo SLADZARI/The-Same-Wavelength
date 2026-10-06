@@ -1,0 +1,56 @@
+{
+  "project": "ILKA Boat Value Calculator",
+  "updated": "2026-10-06",
+  "artifacts": [
+    {
+      "artifactId": "ilka.product.boat-value-calculator",
+      "documentType": "PRODUCT",
+      "currentVersion": "1.0",
+      "status": "APPROVED",
+      "path": "docs/product/boat-value-calculator.v1.0.md",
+      "sourceSystem": "GIT",
+      "authorityType": "APPROVED_AUTHORITY",
+      "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.decision.economic-baseline",
+      "documentType": "DECISION",
+      "currentVersion": "1.0",
+      "status": "APPROVED",
+      "path": "docs/decision/economic-baseline.v1.0.md",
+      "sourceSystem": "GIT",
+      "authorityType": "APPROVED_AUTHORITY",
+      "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.domain.boat-value-calculator",
+      "documentType": "DOMAIN",
+      "currentVersion": "0.1",
+      "status": "DRAFT",
+      "path": "docs/domain/boat-value-calculator.v0.1.json",
+      "sourceSystem": "GIT",
+      "authorityType": "REFERENCE",
+      "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.result.calculator-foundation",
+      "documentType": "RESULT",
+      "currentVersion": "0.1",
+      "status": "REVIEW",
+      "path": "results/calculator-foundation.v0.1.md",
+      "sourceSystem": "GIT",
+      "authorityType": "IMPLEMENTATION_AUTHORITY",
+      "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.research.marina-offers",
+      "documentType": "RESEARCH",
+      "currentVersion": "0.1",
+      "status": "REVIEW",
+      "path": "evidence/marina-offers.v0.1.json",
+      "sourceSystem": "GIT",
+      "authorityType": "EVIDENCE",
+      "updated": "2026-10-06"
+    }
+  ]
+}

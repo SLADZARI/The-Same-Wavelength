@@ -7,10 +7,11 @@
   "readFirst": [
     "ARTIFACT_INDEX.json",
     "APPROVED_STATE.json",
-    "docs/product/boat-value-calculator.v1.0.md",
+    "docs/product/boat-value-calculator.v1.1.md",
     "docs/decision/economic-baseline.v1.0.md",
-    "docs/domain/boat-value-calculator.v1.0.json",
-    "results/calculator-foundation.v0.1.md",
+    "docs/domain/boat-value-calculator.v1.1.json",
+    "docs/change-proposal/acquisition-radar-liveability.v1.0.md",
+    "results/calculator-foundation.v0.3.md",
     "evidence/marina-offers.v0.1.json",
     "README.md",
     "docs/research-v2-model.md"
@@ -20,23 +21,28 @@
     "DOMAIN": "ilka.domain.boat-value-calculator",
     "DECISION": [
       "ilka.decision.economic-baseline"
+    ],
+    "CHANGE_PROPOSAL": [
+      "ilka.change-proposal.acquisition-radar-liveability"
     ]
   },
   "protectedAreas": [
     "Budget baseline and housing-first economics",
-    "Metric meanings once approved",
+    "Two private cabins + six-place liveability requirement",
+    "Immediate move-in screening",
+    "Metric meanings",
     "Evidence provenance and offer history"
   ],
   "currentResult": {
     "artifactId": "ilka.result.calculator-foundation",
-    "path": "results/calculator-foundation.v0.1.md",
+    "path": "results/calculator-foundation.v0.3.md",
     "branch": "feat/ilka-value-calculator"
   },
   "activeIntegrationBranch": "feat/ilka-value-calculator",
   "currentGate": {
     "gate": "G5_BUILD",
     "status": "OPEN",
-    "reason": "DOMAIN v1.0 is approved. Implement Boat Acquisition Radar v1 on the existing integration branch without changing approved semantics."
+    "reason": "PRODUCT v1.1 and DOMAIN v1.1 are approved. Implement Acquisition Radar v1 without changing approved semantics."
   },
   "implementation": {
     "entrypoint": "index.html",
@@ -53,6 +59,7 @@
     "Do not treat GitHub comments as approved Decisions.",
     "Do not overwrite historical prices or offers when a newer quote arrives.",
     "Do not copy private email bodies, personal phone numbers or private addresses into this public repository.",
-    "Do not include monetization income in the base housing viability case unless a separate approved scenario explicitly enables it."
+    "Do not include monetization income in the base housing viability case.",
+    "Do not treat expected market uplift from DIY improvements as FACT unless evidence supports it."
   ]
 }

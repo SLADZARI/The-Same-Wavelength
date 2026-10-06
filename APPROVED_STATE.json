@@ -8,7 +8,7 @@
   },
   "DOMAIN": {
     "artifactId": "ilka.domain.boat-value-calculator",
-    "version": "1.2",
+    "version": "1.3",
     "status": "APPROVED"
   },
   "ARCHITECTURE": null,
@@ -23,6 +23,11 @@
   "changeProposals": [
     {
       "artifactId": "ilka.change-proposal.acquisition-radar-liveability",
+      "version": "1.0",
+      "status": "APPROVED"
+    },
+    {
+      "artifactId": "ilka.change-proposal.real-offer-g6-harmonization",
       "version": "1.0",
       "status": "APPROVED"
     }
@@ -43,6 +48,11 @@
     "Verified marina terms are represented by MarinaOffer and must retain evidence lineage.",
     "Hard gates cannot be overridden by subjective value scoring.",
     "Base-case economics use expected resale; downside/walk-away calculations use quick-sale value.",
-    "Monetization remains outside the housing base case."
+    "Monetization remains outside the housing base case.",
+    "BoatCandidate and BoatOffer are distinct at runtime; offer history is append-only and newer prices do not overwrite prior observations.",
+    "Transaction economics use all-in offer price before logistics; raw ASK/BID is not treated as the purchase cost when fees apply.",
+    "Critical monetary inputs distinguish UNKNOWN / ESTIMATE / QUOTE / ACTUAL; UNKNOWN cannot silently become a confirmed zero.",
+    "Emergency Reserve is retained liquidity, not an expense; Cost-to-Habitable, Cash Required and Emergency Reserve are separate KPIs.",
+    "Logistics feasibility uses UNKNOWN / PASS / FAIL and includes TOW as a supported mode."
   ]
 }

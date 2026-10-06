@@ -3,7 +3,7 @@ artifactId: ilka.result.calculator-foundation
 project: ILKA Boat Value Calculator
 documentType: RESULT
 projectStage: BUILD
-gate: G5_BUILD
+gate: G2_DOMAIN_LOCK
 status: REVIEW
 version: 0.1
 updated: 2026-10-06
@@ -64,4 +64,4 @@ None. No production deployment is authorized by this Result.
 
 ## Gate note
 
-Implementation already existed before the Project Kernel. This Result is a migration/harmonization Result. Further semantic expansion should wait for G2 DOMAIN review; validation and release remain open.
+Current controlling gate: **G2_DOMAIN_LOCK**. Implementation already existed before the Project Kernel and is preserved as historical/current implementation evidence inside this migration Result. Further semantic expansion should wait for DOMAIN review; G5 implementation expansion, G6 validation and G7 release remain open.

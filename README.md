@@ -24,6 +24,9 @@
 - **Delta vs rent** = economic cost − apartment rent over the same horizon.
 - **Value score** = weighted 0–100 quality score independent of price.
 - **Value index** = quality score / €1k first-year economic cost.
+- **Max buy @ budget** = максимальная цена покупки, при которой economic cost укладывается в заданный месячный лимит.
+- **Max buy vs rent** = максимальная цена покупки, при которой владение за горизонт не дороже альтернативной аренды квартиры.
+- **Cash-only ceiling** = жёсткий потолок покупки без учёта будущей продажи лодки.
 
 ## Логистика
 

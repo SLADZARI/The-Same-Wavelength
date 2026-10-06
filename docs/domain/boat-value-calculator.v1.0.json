@@ -4,12 +4,12 @@
   "documentType": "DOMAIN",
   "projectStage": "DECISION",
   "gate": "G2_DOMAIN_LOCK",
-  "status": "APPROVED",
+  "status": "SUPERSEDED",
   "version": "1.0",
   "updated": "2026-10-06",
   "owner": "Modern Pilgrims",
   "sourceSystem": "GIT",
-  "authorityType": "APPROVED_AUTHORITY",
+  "authorityType": "HISTORY",
   "supersedes": "0.1",
   "entities": {
     "BoatCandidate": {
@@ -251,5 +251,6 @@
     "Opportunity-cost discounting",
     "Monetization/commercial scenarios",
     "Actual-vs-budget ledger"
-  ]
+  ],
+  "supersededBy": "1.1"
 }

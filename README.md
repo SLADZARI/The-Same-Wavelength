@@ -83,7 +83,7 @@ python3 -m http.server 8080
 ## Текущее состояние MP_DSL
 
 - PRODUCT v1.1 — APPROVED
-- DOMAIN v1.1 — APPROVED
-- Result v0.3 — G5_BUILD / DRAFT
+- DOMAIN v1.2 — APPROVED
+- Result v0.4 — G6_VALIDATION / REVIEW (browser smoke open)
 - PR #1 — draft
 - production deploy — не разрешён

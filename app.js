@@ -10,6 +10,27 @@ const scoreDefs = [
   ["docsScore","Документы / ликвидность",10],
 ];
 
+const marinaPresets = [
+  {
+    id:"tamka-winter-2026",
+    name:"Tamka, Gdańsk — Nov 2026 → Apr 2027",
+    type:"fixedTotal",
+    totalPLN:3401,
+    months:6,
+    referenceLengthM:9.5,
+    note:"Прямой ответ 06.10.2026: 3401 PLN за 6 месяцев для лодки 9.5 м; жить на борту можно; электричество и вода по счётчику; WC 5 PLN/раз, душ 10 PLN/раз; мачту снимать не нужно."
+  },
+  {
+    id:"sienna-winter-2026",
+    name:"Sienna Grobla, Gdańsk — Nov 2026 → Apr 2027",
+    type:"dailyPerMeter",
+    ratePLNPerMDay:2,
+    daysPerMonth:30.44,
+    referenceLengthM:9.5,
+    note:"Прямой ответ 06.10.2026: 2 PLN за метр LOA в сутки; для 9.5 м = 19 PLN/сутки; жить на борту можно; электричество и вода оплачиваются отдельно."
+  }
+];
+
 const defaults = {
   settings:{rentPLN:3150,budgetUSD:1000,plnPerEur:4.30,usdPerEur:1.15,horizonMonths:12},
   boats:[newBoat("Hamburg template 10.5 × 3.3")]
@@ -133,6 +154,35 @@ function renderEditor(){
   });
   renderScoreInputs();
 }
+function marinaPresetMonthlyEUR(p,b){
+  const plnPerEur=Math.max(num(state.settings.plnPerEur),0.01);
+  if(p.type==="fixedTotal") return num(p.totalPLN)/Math.max(num(p.months),1)/plnPerEur;
+  if(p.type==="dailyPerMeter") return num(p.ratePLNPerMDay)*Math.max(num(b.lengthM),0)*num(p.daysPerMonth)/plnPerEur;
+  return 0;
+}
+function renderMarinaPresets(){
+  const select=$("#marinaPreset"), info=$("#marinaPresetInfo"), apply=$("#applyMarinaPreset");
+  if(!select||!info||!apply||!boat()) return;
+  const previous=select.value;
+  select.innerHTML=marinaPresets.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join("");
+  if(marinaPresets.some(p=>p.id===previous)) select.value=previous;
+  const refresh=()=>{
+    const p=marinaPresets.find(x=>x.id===select.value)||marinaPresets[0];
+    const monthly=marinaPresetMonthlyEUR(p,boat());
+    const lengthNote=p.type==="fixedTotal" && Math.abs(num(boat().lengthM)-num(p.referenceLengthM))>0.1
+      ? ` Важно: фиксированный quote был дан для ${p.referenceLengthM} м и требует переподтверждения для этой лодки.`
+      : "";
+    info.textContent=`${p.note} Эквивалент по текущему курсу: ~${money(monthly)}/мес.${lengthNote}`;
+  };
+  select.onchange=refresh;
+  apply.onclick=()=>{
+    const p=marinaPresets.find(x=>x.id===select.value)||marinaPresets[0];
+    boat().marinaMonthlyEUR=Math.round(marinaPresetMonthlyEUR(p,boat())*100)/100;
+    save();renderAll();
+  };
+  refresh();
+}
+
 function renderScoreInputs(){
   const b=boat(), wrap=$("#scoreInputs"); wrap.innerHTML="";
   scoreDefs.forEach(([k,label,w])=>{
@@ -186,7 +236,7 @@ function drawRadar(b){
   });
   svg.innerHTML=html;
 }
-function renderAll(editor=true){renderSettings();renderTable();if(editor)renderEditor();renderComputed()}
+function renderAll(editor=true){renderSettings();renderTable();if(editor)renderEditor();renderComputed();renderMarinaPresets()}
 
 function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 

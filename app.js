@@ -324,7 +324,7 @@ function renderOfferHistory(){
 function renderOfferEditor(){
   const o=currentOffer(),el=$("#currentOfferEditor"); if(!el)return;
   if(!o){el.innerHTML="";return;}
-  const premium=typeof o.buyerPremium==="object"?(Core.maybeNum(o.buyerPremium.ratePct)??0):0;
+  const premium=o.buyerPremium && typeof o.buyerPremium==="object"?(Core.maybeNum(o.buyerPremium.ratePct)??0):0;
   const tax=offerTaxRate(o);
   el.innerHTML=`<div class="grid four offer-editor">
     <label>Price type<select data-offer-field="priceType">${["ASK","BID","COUNTER","ACCEPTED"].map(v=>`<option ${v===o.priceType?"selected":""}>${v}</option>`).join("")}</select></label>

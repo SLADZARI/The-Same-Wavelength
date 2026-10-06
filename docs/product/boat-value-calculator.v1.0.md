@@ -4,13 +4,14 @@ project: ILKA Boat Value Calculator
 documentType: PRODUCT
 projectStage: CLARITY
 gate: G1_PRODUCT_LOCK
-status: APPROVED
+status: SUPERSEDED
 version: 1.0
 updated: 2026-10-06
 owner: Modern Pilgrims
 sourceSystem: GIT
-authorityType: APPROVED_AUTHORITY
+authorityType: HISTORY
 supersedes: —
+supersededBy: 1.1
 ---
 
 # ILKA Boat Value Calculator — Product

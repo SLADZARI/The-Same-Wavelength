@@ -374,27 +374,31 @@ function renderEditor(){
       else if(el.type==="number"||el.type==="range") b[k]=num(el.value);
       else b[k]=el.value;
       if(k==="name") $("#boatTitle").textContent=b.name||"Кандидат";
-      if(k==="url"&&!b.sourceSite) b.sourceSite=sourceFromUrl(b.url);
       save();renderCandidateSnapshot();renderTable();renderComputed();renderLogisticsSummary();renderImprovementTotals();renderMarinaPresets();
     };
   });
   renderCandidateSnapshot();
+  renderOfferPanel();
   renderImprovementList();
   renderScoreInputs();
 }
 
 function optionCost(c,mode){
   const o=c.logistics.options.find(x=>x.mode===mode);
-  return o?money(o.cost):"—";
+  if(!o)return "—";
+  if(o.state==="FAIL")return "FAIL";
+  if(o.state==="UNKNOWN")return "UNKNOWN";
+  if(!o.complete)return "~"+money(o.cost)+" · evidence?";
+  return money(o.cost);
 }
+
 function renderLogisticsSummary(){
   const b=boat(); if(!b)return; const c=calc(b);
   const selected=c.logistics.selected;
-  $("#logisticsSummary").innerHTML=`
-    <div><span>LOCAL</span><strong>${optionCost(c,"LOCAL")}</strong></div>
-    <div><span>SEA</span><strong>${optionCost(c,"SEA")}</strong></div>
-    <div><span>ROAD</span><strong>${optionCost(c,"ROAD")}</strong></div>
-    <div><span>Выбрано</span><strong>${selected?selected.mode+" · "+money(selected.cost):"нет данных"}</strong></div>`;
+  $("#logisticsSummary").innerHTML=[
+    ["LOCAL",optionCost(c,"LOCAL")],["SEA",optionCost(c,"SEA")],["ROAD",optionCost(c,"ROAD")],["TOW",optionCost(c,"TOW")]
+  ].map(([a,v])=>`<div><span>${a}</span><strong>${v}</strong></div>`).join("")+
+  `<div class="selected-logistics"><span>Выбрано</span><strong>${selected?selected.mode+" · "+money(selected.cost):"нет подтверждённого пути"}</strong></div>`;
 }
 
 function renderImprovementList(){

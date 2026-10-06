@@ -9,8 +9,9 @@
     "APPROVED_STATE.json",
     "docs/product/boat-value-calculator.v1.1.md",
     "docs/decision/economic-baseline.v1.0.md",
-    "docs/domain/boat-value-calculator.v1.2.json",
+    "docs/domain/boat-value-calculator.v1.3.json",
     "docs/change-proposal/acquisition-radar-liveability.v1.0.md",
+    "docs/change-proposal/real-offer-g6-harmonization.v1.0.md",
     "results/calculator-foundation.v0.5.md",
     "reports/acquisition-radar-validation.v0.1.md",
     "evidence/marina-offers.v0.1.json",
@@ -24,7 +25,8 @@
       "ilka.decision.economic-baseline"
     ],
     "CHANGE_PROPOSAL": [
-      "ilka.change-proposal.acquisition-radar-liveability"
+      "ilka.change-proposal.acquisition-radar-liveability",
+      "ilka.change-proposal.real-offer-g6-harmonization"
     ]
   },
   "protectedAreas": [
@@ -43,7 +45,7 @@
   "currentGate": {
     "gate": "G6_VALIDATION",
     "status": "OPEN",
-    "reason": "Decision Cockpit UI is implemented on the active Result branch; redesigned browser smoke and visual/mobile acceptance remain required before G6 can pass."
+    "reason": "Real-offer/evidence harmonization approved for implementation; G6 remains OPEN until real-fixture Playwright smoke passes."
   },
   "implementation": {
     "entrypoint": "index.html",

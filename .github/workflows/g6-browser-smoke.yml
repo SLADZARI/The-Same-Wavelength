@@ -1,0 +1,42 @@
+name: G6 Browser Smoke
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  cockpit-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Playwright
+        run: npm install --no-save @playwright/test@1.55.0
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Calculation tests
+        run: node tests/calculator-core.test.js
+
+      - name: Browser smoke
+        run: npx playwright test
+
+      - name: Upload G6 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g6-browser-smoke-evidence
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: warn
+          retention-days: 30

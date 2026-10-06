@@ -215,39 +215,42 @@ function candidateMatchesFilter(c){
   return true;
 }
 
+function priceLabel(o){
+  if(!o)return "no offer";
+  return (o.priceType||"ASK")+" "+nativeMoney(o.amount,o.currency||"EUR");
+}
+
 function gateCompact(c){
   const vals=Object.values(c.gates);
   if(vals.includes("FAIL")) return "hard fail";
-  const unknown=vals.filter(x=>x==="UNKNOWN").length;
-  if(unknown) return `${unknown} unknown`;
+  const hardUnknown=vals.filter(x=>x==="UNKNOWN").length;
+  if(hardUnknown) return hardUnknown+" gate unknown";
+  if(c.evidenceGate==="UNKNOWN") return c.evidenceUnknowns.length+" cost unknown";
   return "gates closed";
 }
 
 function renderTable(){
   const wrap=$("#candidateList"),stats=$("#portfolioStats"); if(!wrap)return;
   const priority={BUY_ZONE:0,CONSIDER:1,NEGOTIATE:2,HOLD:3,WEAK:4,WALK_AWAY:5};
-  const all=state.boats.map(b=>({b,c:calc(b)})).sort((x,y)=>(priority[x.c.recommendationCode]??9)-(priority[y.c.recommendationCode]??9)||y.c.marginOfSafety-x.c.marginOfSafety);
+  const all=state.boats.map(b=>({b,c:calc(b),o:currentOffer(b)})).sort((x,y)=>(priority[x.c.recommendationCode]??9)-(priority[y.c.recommendationCode]??9)||y.c.marginOfSafety-x.c.marginOfSafety);
   const rows=all.filter(x=>candidateMatchesFilter(x.c));
   const strong=all.filter(x=>["BUY_ZONE","CONSIDER","NEGOTIATE"].includes(x.c.recommendationCode)).length;
   const hold=all.filter(x=>x.c.recommendationCode==="HOLD").length;
   const reject=all.filter(x=>["WALK_AWAY","WEAK"].includes(x.c.recommendationCode)).length;
-  if(stats) stats.innerHTML=`${all.length} всего<br>${strong} сильных · ${hold} hold · ${reject} отсев`;
-  if(!rows.length){
-    wrap.innerHTML='<div class="empty-state">В этом фильтре пока нет кандидатов.</div>';
-    return;
-  }
-  wrap.innerHTML=rows.map(({b,c})=>{
-    const log=c.logistics.selected;
-    const selected=b.id===selectedId?" selected":"";
-    const marginClass=c.marginOfSafety>=0?"positive":"negative";
+  if(stats) stats.innerHTML=all.length+" всего<br>"+strong+" сильных · "+hold+" hold · "+reject+" отсев";
+  if(!rows.length){wrap.innerHTML='<div class="empty-state">В этом фильтре пока нет кандидатов.</div>';return;}
+  wrap.innerHTML=rows.map(({b,c,o})=>{
+    const log=c.logistics.selected,selected=b.id===selectedId?" selected":"",marginClass=c.marginOfSafety>=0?"positive":"negative";
+    const source=o?.sourceSite||"источник ?";
+    const price=o?priceLabel(o):"no offer";
     return `<button type="button" class="candidate-card${selected}" data-candidate="${escapeHtml(b.id)}">
       <div class="candidate-card-top">
-        <div><h3>${escapeHtml(b.name||"Кандидат")}</h3><div class="source">${escapeHtml(b.location||"локация ?")} · ${escapeHtml(b.sourceSite||"источник ?")}</div></div>
+        <div><h3>${escapeHtml(b.name||"Кандидат")}</h3><div class="source">${escapeHtml(b.location||"локация ?")} · ${escapeHtml(source)}</div></div>
         <span class="tag ${c.recommendationClass}">${recommendationLabel(c)}</span>
       </div>
       <div class="candidate-card-grid">
-        <div><span>Ask</span><strong>${money(num(b.purchaseEUR))}</strong></div>
-        <div><span>Walk-away</span><strong>${money(Math.max(0,c.walkAwayPrice))}</strong></div>
+        <div><span>Current</span><strong>${escapeHtml(price)}</strong></div>
+        <div><span>All-in / EUR</span><strong>${c.offer.conversionKnown?money(c.transactionAllInPrice):"UNKNOWN"}</strong></div>
         <div><span>Жильё</span><strong>${num(b.cabins)||"?"} кают · ${num(b.berths)||"?"} мест</strong></div>
         <div><span>Логистика</span><strong>${log?log.mode+" · "+money(log.cost):"unknown"}</strong></div>
       </div>
@@ -257,30 +260,106 @@ function renderTable(){
       </div>
     </button>`;
   }).join("");
-  wrap.querySelectorAll("[data-candidate]").forEach(el=>{
-    el.onclick=()=>{selectedId=el.dataset.candidate;renderAll();};
-  });
+  wrap.querySelectorAll("[data-candidate]").forEach(el=>{el.onclick=()=>{selectedId=el.dataset.candidate;renderAll();};});
 }
 
 function renderCandidateSnapshot(){
   const b=boat(); if(!b)return;
-  const c=calc(b);
+  const o=currentOffer(b);
   const fields=[
     ["Каюты",num(b.cabins)||"?"],
     ["Спальных",num(b.berths)||"?"],
     ["Комфортно",num(b.comfortablePeople)||"?"],
     ["Заселение",b.moveInState||"UNKNOWN"],
     ["Корпус",b.material||"UNKNOWN"],
-    ["Габарит",num(b.lengthM)?`${num(b.lengthM).toFixed(1)} × ${num(b.beamM).toFixed(2)} м`:"?"]
+    ["Габарит",num(b.lengthM)?num(b.lengthM).toFixed(1)+" × "+num(b.beamM).toFixed(2)+" м":"?"]
   ];
   $("#candidateSnapshot").innerHTML=fields.map(([a,v])=>`<div class="snapshot-item"><span>${a}</span><strong>${escapeHtml(v)}</strong></div>`).join("");
   const meta=$("#candidateSourceMeta");
-  if(meta) meta.textContent=[b.sellerType,b.sourceSite,b.offerObservedAt].filter(Boolean).join(" · ");
+  if(meta) meta.textContent=[o?.priceType,o?.sellerType,o?.sourceSite,o?.observedAt].filter(Boolean).join(" · ");
   const link=$("#openListingBtn");
   if(link){
-    if(b.url){link.href=b.url;link.classList.remove("disabled");link.removeAttribute("aria-disabled");}
+    if(o?.sourceUrl){link.href=o.sourceUrl;link.classList.remove("disabled");link.removeAttribute("aria-disabled");}
     else{link.removeAttribute("href");link.classList.add("disabled");link.setAttribute("aria-disabled","true");}
   }
+}
+
+function recomputeOffer(o){
+  if(!o)return;
+  o.derivedAllInPrice=Core.offerAllInOriginal({...o,derivedAllInPrice:null});
+}
+
+function offerTaxRate(o){
+  const f=(o?.taxFees||[]).find(x=>String(x.base||"").toUpperCase()==="PREMIUM");
+  return Core.maybeNum(f?.ratePct)??0;
+}
+
+function renderOfferSummary(){
+  const o=currentOffer(),el=$("#currentOfferSummary"); if(!el)return;
+  if(!o){el.innerHTML='<div class="empty-state">Нет текущего offer.</div>';return;}
+  const econ=Core.offerEconomics(o,state.settings);
+  const expiry=o.auctionEnd||o.offerExpiry||"—";
+  el.innerHTML=[
+    ["Current "+(o.priceType||"ASK"),nativeMoney(o.amount,o.currency||"EUR")],
+    ["All-in native",econ.allInOriginal===null?"UNKNOWN":nativeMoney(econ.allInOriginal,o.currency||"EUR")],
+    ["All-in scenario EUR",econ.allInEUR===null?"UNKNOWN":money(econ.allInEUR)],
+    ["Статус / expiry",(o.status||"OBSERVED")+" · "+expiry]
+  ].map(([a,v])=>`<div class="snapshot-item"><span>${escapeHtml(a)}</span><strong>${escapeHtml(v)}</strong></div>`).join("");
+}
+
+function renderOfferHistory(){
+  const b=boat(),el=$("#offerHistory"); if(!b||!el)return;
+  const cur=currentOffer(b);
+  const list=offersFor(b.id).slice().sort((a,z)=>String(z.observedAt||"").localeCompare(String(a.observedAt||""))||String(z.offerId).localeCompare(String(a.offerId)));
+  el.innerHTML=list.map(o=>{
+    const econ=Core.offerEconomics(o,state.settings),isCurrent=cur&&cur.offerId===o.offerId;
+    return `<div class="offer-history-row${isCurrent?" current":""}">
+      <div><strong>${escapeHtml(priceLabel(o))}</strong><small>${escapeHtml(o.observedAt||"")} · ${escapeHtml(o.sourceSite||"")}</small></div>
+      <div><span>all-in</span><strong>${econ.allInEUR===null?"UNKNOWN":money(econ.allInEUR)}</strong></div>
+      <div><span>status</span><strong>${escapeHtml(o.status||"OBSERVED")}</strong></div>
+    </div>`;
+  }).join("")||'<div class="empty-state">Истории цен пока нет.</div>';
+}
+
+function renderOfferEditor(){
+  const o=currentOffer(),el=$("#currentOfferEditor"); if(!el)return;
+  if(!o){el.innerHTML="";return;}
+  const premium=typeof o.buyerPremium==="object"?(Core.maybeNum(o.buyerPremium.ratePct)??0):0;
+  const tax=offerTaxRate(o);
+  el.innerHTML=`<div class="grid four offer-editor">
+    <label>Price type<select data-offer-field="priceType">${["ASK","BID","COUNTER","ACCEPTED"].map(v=>`<option ${v===o.priceType?"selected":""}>${v}</option>`).join("")}</select></label>
+    <label>Amount<input data-offer-field="amount" type="number" value="${num(o.amount)}"></label>
+    <label>Currency<select data-offer-field="currency">${["EUR","PLN","USD"].map(v=>`<option ${v===o.currency?"selected":""}>${v}</option>`).join("")}</select></label>
+    <label>Observed<input data-offer-field="observedAt" type="date" value="${escapeHtml(o.observedAt||today())}"></label>
+    <label>Buyer premium, %<input data-offer-special="premium" type="number" step="0.1" value="${premium}"></label>
+    <label>Tax on premium, %<input data-offer-special="taxPremium" type="number" step="0.1" value="${tax}"></label>
+    <label>Seller<select data-offer-field="sellerType">${["UNKNOWN","PRIVATE","BROKER","DEALER","AUCTION","OTHER"].map(v=>`<option ${v===o.sellerType?"selected":""}>${v}</option>`).join("")}</select></label>
+    <label>Status<select data-offer-field="status">${["OBSERVED","CONTACTED","NEGOTIATING","ACCEPTED","HISTORICAL","EXPIRED","REJECTED","WITHDRAWN","SOLD"].map(v=>`<option ${v===o.status?"selected":""}>${v}</option>`).join("")}</select></label>
+    <label>Source site<input data-offer-field="sourceSite" value="${escapeHtml(o.sourceSite||"")}"></label>
+    <label class="span-three">Source URL<input data-offer-field="sourceUrl" type="url" value="${escapeHtml(o.sourceUrl||"")}"></label>
+    <label>Auction end / expiry<input data-offer-field="auctionEnd" value="${escapeHtml(o.auctionEnd||o.offerExpiry||"")}"></label>
+    <label class="span-three">Conditions / comment<textarea data-offer-field="comment" rows="2">${escapeHtml(o.comment||o.conditions||"")}</textarea></label>
+  </div>
+  <p class="note">Новая цена = новая запись через “+ Price observation”. Редактирование здесь корректирует выбранное текущее наблюдение.</p>`;
+  const refresh=()=>{recomputeOffer(o);save();renderOfferSummary();renderOfferHistory();renderCandidateSnapshot();renderTable();renderComputed();};
+  el.querySelectorAll("[data-offer-field]").forEach(input=>{
+    input.oninput=()=>{
+      const k=input.dataset.offerField;
+      o[k]=input.type==="number"?num(input.value):input.value;
+      if(k==="sourceUrl"&&!o.sourceSite)o.sourceSite=sourceFromUrl(o.sourceUrl);
+      refresh();
+    };
+  });
+  el.querySelector("[data-offer-special='premium']").oninput=e=>{
+    const rate=num(e.target.value);o.buyerPremium=rate?{ratePct:rate}:null;refresh();
+  };
+  el.querySelector("[data-offer-special='taxPremium']").oninput=e=>{
+    const rate=num(e.target.value);o.taxFees=rate?[{label:"Tax on buyer premium",ratePct:rate,base:"PREMIUM"}]:[];refresh();
+  };
+}
+
+function renderOfferPanel(){
+  renderOfferSummary();renderOfferEditor();renderOfferHistory();
 }
 
 function renderEditor(){

@@ -76,7 +76,7 @@ function inferEvidence(raw,field){
 function migrateBoat(raw){
   const b={...newBoat(raw?.name||"Кандидат"),...(raw||{})};
   b.model=b.model||"";
-  b.comfortablePeople=num(b.comfortablePeople)||num(b.berths)||0;
+  b.comfortablePeople=Object.prototype.hasOwnProperty.call(raw||{},"comfortablePeople")?num(raw.comfortablePeople):0;
   b.moveInState=b.moveInState||"UNKNOWN";
   b.legalGate=b.legalGate||"UNKNOWN"; b.structuralGate=b.structuralGate||"UNKNOWN"; b.insuranceGate=b.insuranceGate||"UNKNOWN";
   b.localFeasibility=b.localFeasibility||((raw?.localFeasible===true)?"PASS":"UNKNOWN");

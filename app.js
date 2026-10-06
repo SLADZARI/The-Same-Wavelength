@@ -190,7 +190,7 @@ function renderSettings(){
     el.value=state.settings[k]??"";
     el.oninput=()=>{
       state.settings[k]=el.type==="number"?num(el.value):el.value;
-      save();renderScenarioSummary();renderTable();renderComputed();renderImprovementTotals();renderMarinaPresets();
+      save();renderScenarioSummary();renderTable();renderComputed();renderOfferSummary();renderOfferHistory();renderImprovementTotals();renderMarinaPresets();
     };
   });
 }

@@ -92,6 +92,9 @@ function calc(b){
   const allInEconomicMonthly=economic/months;
   const runRateVsBudget=monthly/budgetEUR;
   const housingSaving=rentEUR-monthly;
+  const maxPurchaseCash=budgetEUR*months-logisticsCost-refit-monthly*months;
+  const maxPurchaseEconomic=budgetEUR*months+num(b.resaleEUR)-logisticsCost-refit-monthly*months;
+  const maxPurchaseVsRent=rentAlternative+num(b.resaleEUR)-logisticsCost-refit-monthly*months;
   const upfrontAtRisk=Math.max(0,landed-num(b.resaleEUR));
   const payback=housingSaving>0?upfrontAtRisk/housingSaving:Infinity;
 
@@ -106,7 +109,7 @@ function calc(b){
   else if(score>=60 && allInEconomicMonthly<=budgetEUR*1.2 && deltaVsRent<=3000){verdict="Стоит рассматривать";verdictClass="yellow"}
   else {verdict="Нужна осторожность";verdictClass="red"}
 
-  return {hours,fuelLitres,seaFuel,seaCost,roadCost,logisticsMode,logisticsCost,refit,landed,monthly,cash,economic,rentEUR,rentAlternative,deltaVsRent,budgetEUR,allInEconomicMonthly,runRateVsBudget,housingSaving,payback,score,valueIndex,verdict,verdictClass};
+  return {hours,fuelLitres,seaFuel,seaCost,roadCost,logisticsMode,logisticsCost,refit,landed,monthly,cash,economic,rentEUR,rentAlternative,deltaVsRent,budgetEUR,allInEconomicMonthly,runRateVsBudget,housingSaving,maxPurchaseCash,maxPurchaseEconomic,maxPurchaseVsRent,payback,score,valueIndex,verdict,verdictClass};
 }
 
 function renderSettings(){
@@ -118,7 +121,7 @@ function renderSettings(){
 
 function renderTable(){
   const table=$("#boatsTable");
-  table.innerHTML=`<thead><tr><th>Кандидат</th><th>Цена</th><th>Габариты</th><th>Логистика</th><th>Landed</th><th>€/мес</th><th>Δ vs rent</th><th>Score</th><th>Value</th></tr></thead><tbody></tbody>`;
+  table.innerHTML=`<thead><tr><th>Кандидат</th><th>Цена</th><th>Max buy vs rent</th><th>Габариты</th><th>Логистика</th><th>Landed</th><th>€/мес</th><th>Δ vs rent</th><th>Score</th><th>Value</th></tr></thead><tbody></tbody>`;
   const body=table.querySelector("tbody");
   state.boats.forEach(b=>{
     const c=calc(b);
@@ -126,6 +129,7 @@ function renderTable(){
     const dot=c.verdictClass==="green"?"good":c.verdictClass==="yellow"?"warn":"bad";
     tr.innerHTML=`<td><span class="status-dot ${dot}"></span><b>${escapeHtml(b.name)}</b><br><small>${escapeHtml(b.location||"")}</small></td>
       <td>${money(num(b.purchaseEUR))}</td>
+      <td><b>${money(Math.max(0,c.maxPurchaseVsRent))}</b></td>
       <td>${num(b.lengthM).toFixed(1)} × ${num(b.beamM).toFixed(2)} m</td>
       <td>${c.logisticsMode==="sea"?"морем":"авто"} · ${money(c.logisticsCost)}</td>
       <td><b>${money(c.landed)}</b></td>
@@ -211,6 +215,9 @@ function renderComputed(){
     ["Экономия жилья / мес",signedMoney(c.housingSaving),c.housingSaving>0?"лодка дешевле аренды по run-rate":"run-rate выше аренды"],
     ["Перегон морем",b.selfPropFeasible?money(c.seaCost):"—",`${c.hours.toFixed(0)} h · ${c.fuelLitres.toFixed(0)} L`],
     ["Автоперевозка",money(c.roadCost),`${num(b.beamM).toFixed(2)} m ширина`],
+    ["Макс. цена vs rent",money(Math.max(0,c.maxPurchaseVsRent)),"потолок покупки для break-even против квартиры"],
+    ["Макс. цена @ budget",money(Math.max(0,c.maxPurchaseEconomic)),"потолок при лимите $/мес с учётом resale"],
+    ["Cash-only потолок",money(Math.max(0,c.maxPurchaseCash)),c.maxPurchaseCash>=0?"без учёта будущей продажи":"текущая модель уже выше cash-бюджета"],
     ["Value index",c.valueIndex.toFixed(1),"score / €1k economic cost"],
     ["Payback",Number.isFinite(c.payback)?c.payback.toFixed(1)+" мес":"—","capital-at-risk / housing saving"],
   ];

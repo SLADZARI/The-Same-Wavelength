@@ -5,7 +5,7 @@ const settings={rentPLN:3150,budgetUSD:1000,horizonMonths:12,plnPerEur:4.3,usdPe
 const base=()=>({
   purchaseEUR:5000,cabins:2,berths:6,comfortablePeople:6,moveInState:"YES",
   legalGate:"PASS",structuralGate:"PASS",insuranceGate:"PASS",
-  localFeasible:true,localLogisticsEUR:200,logisticsImpossible:false,
+  localFeasible:true,localLogisticsEUR:100,logisticsImpossible:false,
   selfPropFeasible:false,roadFeasible:false,
   dueDiligenceEUR:400,closingDocsEUR:100,hullRefitEUR:0,mechanicalRefitEUR:0,safetyRefitEUR:0,moveInInteriorEUR:0,initialReserveEUR:500,
   overlapRentMonths:0,yardStorageDuringRefitEUR:0,temporaryHousingEUR:0,

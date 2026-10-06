@@ -11,7 +11,7 @@
     "docs/decision/economic-baseline.v1.0.md",
     "docs/domain/boat-value-calculator.v1.2.json",
     "docs/change-proposal/acquisition-radar-liveability.v1.0.md",
-    "results/calculator-foundation.v0.4.md",
+    "results/calculator-foundation.v0.5.md",
     "reports/acquisition-radar-validation.v0.1.md",
     "evidence/marina-offers.v0.1.json",
     "README.md",
@@ -36,14 +36,14 @@
   ],
   "currentResult": {
     "artifactId": "ilka.result.calculator-foundation",
-    "path": "results/calculator-foundation.v0.4.md",
+    "path": "results/calculator-foundation.v0.5.md",
     "branch": "feat/ilka-value-calculator"
   },
   "activeIntegrationBranch": "feat/ilka-value-calculator",
   "currentGate": {
     "gate": "G6_VALIDATION",
     "status": "OPEN",
-    "reason": "Acquisition Radar v1 calculation layer is validated; browser smoke flow remains required before G6 can pass."
+    "reason": "Decision Cockpit UI is implemented on the active Result branch; redesigned browser smoke and visual/mobile acceptance remain required before G6 can pass."
   },
   "implementation": {
     "entrypoint": "index.html",

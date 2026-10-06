@@ -1,7 +1,66 @@
 # ILKA Boat Value Calculator
 
-A decision tool for comparing liveaboard boat candidates by **total landed cost, logistics, monthly ownership cost, housing savings, refit burden and retained asset value**.
+Калькулятор для выбора лодки под постоянное проживание и проект ILKA.
 
-This repository is being repurposed for the ILKA liveaboard acquisition project.
+## Главная идея
 
-The first application version is developed on a feature branch and proposed through a pull request.
+Мы сравниваем не цену объявления, а **полную экономику получения пригодного жилого актива в Польше**:
+
+- цена покупки;
+- перегон своим ходом **или** автоперевозка;
+- краны, разрешения, escort, подготовка;
+- обязательный стартовый ремонт;
+- марина и остальные ежемесячные расходы;
+- экономия относительно текущей аренды;
+- ожидаемая остаточная стоимость лодки;
+- качество корпуса, планировки, двигателя и потенциала переделки.
+
+## Основные показатели
+
+- **Landed cost** = purchase + cheapest feasible logistics + required initial refit.
+- **Monthly run-rate** = marina + insurance + maintenance reserve + utilities + local fuel + winter equivalent + misc.
+- **Cash cost** = landed + monthly run-rate × horizon.
+- **Economic cost** = cash cost − expected resale value.
+- **Delta vs rent** = economic cost − apartment rent over the same horizon.
+- **Value score** = weighted 0–100 quality score independent of price.
+- **Value index** = quality score / €1k first-year economic cost.
+
+## Логистика
+
+Калькулятор одновременно считает два сценария:
+
+1. **Своим ходом** — морские мили, крейсерская скорость, коэффициент манёвров/канала, расход л/ч, diesel, стоянки, еда, дорога экипажа, prep и contingency.
+2. **Автотранспорт** — ставка перевозчика, краны, permits/escort, подготовка и резерв.
+
+Если перегон своим ходом отмечен как возможный, выбирается более дешёвый сценарий.
+
+Стартовый шаблон — Hamburg → Gdynia:
+- 465 nm морем;
+- 750 km по дороге;
+- все значения являются **редактируемыми плановыми допущениями**, а не офертами перевозчиков.
+
+## Бюджетная цель
+
+По умолчанию:
+- аренда квартиры: **3150 PLN/месяц**;
+- лимит: **1000 USD/месяц**;
+- горизонт: **12 месяцев**.
+
+Курсы валют вводятся вручную, чтобы расчёт не зависел от внешнего API.
+
+## Запуск
+
+Это статическое приложение без сборки и зависимостей.
+
+Откройте `index.html` в браузере или опубликуйте репозиторий через GitHub Pages.
+
+Данные сохраняются в `localStorage`. Есть экспорт/импорт JSON для переноса базы кандидатов.
+
+## Что добавить дальше
+
+- реальные quotes от марин как именованные сценарии;
+- таблицу survey/repair quotes по каждому кандидату;
+- отдельный расчёт зимовки;
+- импорт кандидатов из CSV;
+- журнал фактических расходов;
+- монетизацию лодки (charter / stays / content / events) как второй этап, отдельно от базовой housing economics.

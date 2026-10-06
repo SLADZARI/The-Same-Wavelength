@@ -598,13 +598,50 @@ function renderMarinaPresets(){
     const o=offers.find(x=>x.offerId===select.value)||selected;
     b.selectedMarinaOfferId=o.offerId;
     b.marinaMonthlyEUR=Math.round(marinaMonthlyEUR(o,b)*100)/100;
+    b.marinaMonthlyEvidence="QUOTE";
     save();renderAll();
   };
   refresh();
 }
 
+function renderFixtureButton(){
+  const btn=$("#loadFixturesBtn"); if(!btn)return;
+  if(fixtureEvidence.status==="loading"){btn.disabled=true;btn.textContent="Fixtures…";return;}
+  if(fixtureEvidence.status==="error"){btn.disabled=true;btn.textContent="Fixtures unavailable";btn.title=fixtureEvidence.error;return;}
+  btn.disabled=false;btn.textContent="Load 4 fixtures";btn.title="Load/refresh versioned real-offer G6 fixtures from ARTIFACT_INDEX";
+}
+
+async function loadFixtureEvidence(){
+  fixtureEvidence={status:"loading",data:null,path:"",error:""};renderFixtureButton();
+  try{
+    const idx=await fetch("ARTIFACT_INDEX.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error("ARTIFACT_INDEX "+r.status);return r.json();});
+    const a=idx.artifacts.find(x=>x.artifactId==="ilka.research.real-offer-fixtures");
+    if(!a?.path) throw new Error("fixture evidence pointer missing");
+    const data=await fetch(a.path,{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error("EVIDENCE "+r.status);return r.json();});
+    fixtureEvidence={status:"ready",data,path:a.path,error:""};
+  }catch(e){fixtureEvidence={status:"error",data:null,path:"",error:e.message};}
+  renderFixtureButton();
+}
+
+function isBlankCandidate(b){
+  const o=currentOffer(b);
+  return state.boats.length===1 && !b.name?.trim()?.replace("Новый кандидат","") && num(o?.amount)===0 && !o?.sourceUrl;
+}
+
+function applyFixtures(){
+  if(fixtureEvidence.status!=="ready"||!fixtureEvidence.data)return;
+  const data=fixtureEvidence.data,ids=new Set(data.candidates.map(x=>x.id));
+  const existingBlank=state.boats.length===1 && state.boats[0].name==="Новый кандидат" && num(currentOffer(state.boats[0])?.amount)===0;
+  if(existingBlank){const oldId=state.boats[0].id;state.boats=[];state.offers=state.offers.filter(o=>o.candidateId!==oldId);}
+  state.boats=state.boats.filter(b=>!ids.has(b.id)).concat(data.candidates.map(migrateBoat));
+  state.offers=state.offers.filter(o=>!ids.has(o.candidateId)).concat(data.offers.map(migrateOffer));
+  selectedId=data.candidates[0]?.id||state.boats[0]?.id;
+  candidateFilter="all";$$("[data-filter]").forEach(x=>x.classList.toggle("active",x.dataset.filter==="all"));
+  save();renderAll();
+}
+
 function renderAll(editor=true){
-  renderSettings();renderScenarioSummary();renderTable();if(editor)renderEditor();renderComputed();renderLogisticsSummary();renderImprovementTotals();renderMarinaPresets();
+  renderSettings();renderScenarioSummary();renderTable();if(editor)renderEditor();renderComputed();renderLogisticsSummary();renderImprovementTotals();renderMarinaPresets();renderFixtureButton();
 }
 
 $$("[data-filter]").forEach(btn=>btn.onclick=()=>{
@@ -618,20 +655,41 @@ $$(".tab").forEach(t=>t.onclick=()=>{
   t.classList.add("active");$("#tab-"+t.dataset.tab).classList.add("active");
 });
 
-$("#newBoatBtn").onclick=()=>{const b=newBoat();state.boats.push(b);selectedId=b.id;save();renderAll();};
-$("#duplicateBtn").onclick=()=>{const src=boat(),b=JSON.parse(JSON.stringify(src));b.id=uid();b.name=(b.name||"Кандидат")+" — копия";b.improvements=(b.improvements||[]).map(x=>({...x,id:uid()}));state.boats.push(b);selectedId=b.id;save();renderAll();};
-$("#deleteBtn").onclick=()=>{if(state.boats.length<=1)return alert("Оставьте хотя бы один кандидат.");state.boats=state.boats.filter(x=>x.id!==selectedId);selectedId=state.boats[0].id;save();renderAll();};
+$("#newBoatBtn").onclick=()=>{
+  const b=newBoat();state.boats.push(b);state.offers.push(newOffer(b.id));selectedId=b.id;save();renderAll();
+};
+$("#loadFixturesBtn").onclick=applyFixtures;
+$("#addOfferBtn").onclick=()=>{
+  const b=boat(),old=currentOffer(b);if(!b)return;
+  if(old&&old.status==="OBSERVED")old.status="HISTORICAL";
+  const next=migrateOffer(old?{...JSON.parse(JSON.stringify(old)),offerId:uid(),observedAt:today(),status:"OBSERVED"}:newOffer(b.id));
+  next.candidateId=b.id;state.offers.push(next);save();renderAll();
+};
+$("#duplicateBtn").onclick=()=>{
+  const srcBoat=boat(),b=JSON.parse(JSON.stringify(srcBoat));const oldId=b.id;
+  b.id=uid();b.name=(b.name||"Кандидат")+" — копия";b.improvements=(b.improvements||[]).map(x=>({...x,id:uid()}));
+  state.boats.push(b);
+  offersFor(oldId).forEach(o=>state.offers.push(migrateOffer({...JSON.parse(JSON.stringify(o)),offerId:uid(),candidateId:b.id})));
+  if(!offersFor(b.id).length)state.offers.push(newOffer(b.id));
+  selectedId=b.id;save();renderAll();
+};
+$("#deleteBtn").onclick=()=>{
+  if(state.boats.length<=1)return alert("Оставьте хотя бы один кандидат.");
+  const id=selectedId;state.boats=state.boats.filter(x=>x.id!==id);state.offers=state.offers.filter(x=>x.candidateId!==id);
+  selectedId=state.boats[0].id;save();renderAll();
+};
 $("#addImprovementBtn").onclick=()=>{boat().improvements.push(newImprovement());save();renderAll();};
 $("#exportBtn").onclick=()=>{
   const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");
   a.href=URL.createObjectURL(blob);a.download="ilka-acquisition-radar.json";a.click();URL.revokeObjectURL(a.href);
 };
 $("#importInput").onchange=e=>{
-  const f=e.target.files[0];if(!f)return;
+  const file=e.target.files[0];if(!file)return;
   const r=new FileReader();
   r.onload=()=>{try{state=migrateState(JSON.parse(r.result));selectedId=state.boats[0]?.id;save();renderAll();}catch{alert("Не удалось прочитать JSON");}};
-  r.readAsText(f);
+  r.readAsText(file);
 };
 
 renderAll();
 loadMarinaEvidence();
+loadFixtureEvidence();

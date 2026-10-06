@@ -54,7 +54,14 @@ Turn the approved acquisition model into a fast decision interface for real boat
 ## Validation status
 Previous deterministic calculation evidence remains applicable to `calculator-core.js`, which was not changed in this UI iteration.
 
-New `index.html`, `styles.css` and `app.js` wiring still require browser smoke. A preview deployment attempt on 2026-10-06 was blocked by connected Vercel account permissions to create a project; this is an environment/permission limitation, not validation evidence for or against the UI.
+Current static validation after the cockpit rewrite:
+- PASS — `app.js` compiles with ECMAScript Function syntax compilation.
+- PASS — `calculator-core.js` compiles with ECMAScript Function syntax compilation.
+- PASS — 27 explicit `#id` references from `app.js` resolve to elements in the current `index.html`.
+- OPEN — real browser interaction smoke.
+- OPEN — responsive / visual acceptance.
+
+A preview deployment attempt on 2026-10-06 was blocked by connected Vercel account permissions to create a project; this is an environment/permission limitation, not validation evidence for or against the UI.
 
 ## Production impact
 None. PR remains draft. G7 is not authorized.

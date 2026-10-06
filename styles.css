@@ -97,3 +97,15 @@ footer{max-width:1640px;margin:0 auto;padding:0 20px 28px;color:var(--muted);fon
   .metrics{grid-template-columns:1fr}.score-row{grid-template-columns:120px 1fr 28px}.improvement-row{grid-template-columns:1fr}.improvement-totals{grid-template-columns:1fr 1fr}
   .section-title,.candidate-head{display:block}.row-actions{justify-content:flex-start;margin-top:12px}.filter-row{grid-template-columns:repeat(4,1fr)}
 }
+.offer-section-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:22px}
+.offer-section-head h3{margin:0}
+.offer-editor{padding:12px;background:var(--panel-3);border:1px solid var(--line);border-radius:10px}
+.offer-history{display:grid;gap:6px}
+.offer-history-row{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(100px,.7fr) minmax(90px,.6fr);gap:10px;align-items:center;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel-3)}
+.offer-history-row.current{border-color:#58748f;background:#13202d}
+.offer-history-row div{min-width:0}.offer-history-row span,.offer-history-row small{display:block;color:var(--muted);font-size:9px}.offer-history-row strong{display:block;font-size:11px;overflow:hidden;text-overflow:ellipsis}
+.selected-logistics{grid-column:1/-1}
+@media(max-width:700px){
+  .offer-section-head{align-items:flex-start}
+  .offer-history-row{grid-template-columns:1fr 1fr}.offer-history-row>div:first-child{grid-column:1/-1}
+}

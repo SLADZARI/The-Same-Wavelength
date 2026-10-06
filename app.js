@@ -466,43 +466,52 @@ function renderDecisionReasons(b,c){
   const labels={legal:"Документы",structural:"Корпус",logistics:"Логистика",habitability:"Жильё",insurance:"Страхование"};
   const reasons=[];
   Object.entries(c.gates).forEach(([k,v])=>{
-    if(v==="FAIL") reasons.push(["red",`${labels[k]}: hard gate FAIL — высокий score не может это отменить.`]);
-    else if(v==="UNKNOWN") reasons.push(["yellow",`${labels[k]}: нужны подтверждённые данные.`]);
+    if(v==="FAIL") reasons.push(["red",labels[k]+": hard gate FAIL — высокий score не может это отменить."]);
+    else if(v==="UNKNOWN") reasons.push(["yellow",labels[k]+": нужны подтверждённые данные."]);
   });
-  if(!reasons.length){
-    if(c.marginOfSafety<0) reasons.push(["yellow",`Ask выше walk-away на ${money(Math.abs(c.marginOfSafety))}. Нужен торг ниже потолка.`]);
-    if(c.downsideHousingCostMonthly>c.budgetEUR) reasons.push(["yellow",`Downside ${money(c.downsideHousingCostMonthly)}/мес выше лимита ${money(c.budgetEUR)}/мес.`]);
-    if(c.downsideDeltaVsRent>0) reasons.push(["yellow",`Downside за горизонт хуже аренды на ${money(c.downsideDeltaVsRent)}.`]);
-    if(!reasons.length) reasons.push(["green","Hard gates закрыты, downside укладывается в заданные экономические ограничения."]);
+  if(!Object.values(c.gates).includes("FAIL") && c.evidenceUnknowns?.length){
+    c.evidenceUnknowns.slice(0,6).forEach(x=>reasons.push(["yellow","Evidence UNKNOWN: "+x+". Числовой placeholder не считается подтверждённым расходом."]));
   }
-  el.innerHTML=reasons.slice(0,5).map(([cls,text])=>`<div class="reason ${cls}"><i></i><span>${text}</span></div>`).join("");
+  if(!reasons.length){
+    if(c.marginOfSafety<0) reasons.push(["yellow","All-in цена выше walk-away на "+money(Math.abs(c.marginOfSafety))+". Нужен торг ниже потолка."]);
+    if(c.downsideHousingCostMonthly>c.budgetEUR) reasons.push(["yellow","Downside "+money(c.downsideHousingCostMonthly)+"/мес выше лимита "+money(c.budgetEUR)+"/мес."]);
+    if(c.downsideDeltaVsRent>0) reasons.push(["yellow","Downside за горизонт хуже аренды на "+money(c.downsideDeltaVsRent)+"."]);
+    if(!reasons.length) reasons.push(["green","Hard gates и critical evidence закрыты; можно переходить к экономическому решению."]);
+  }
+  el.innerHTML=reasons.slice(0,7).map(([cls,text])=>`<div class="reason ${cls}"><i></i><span>${escapeHtml(text)}</span></div>`).join("");
 }
 
 function renderComputed(){
-  const b=boat(); if(!b)return; const c=calc(b);
+  const b=boat(); if(!b)return; const c=calc(b),o=currentOffer(b);
   const v=$("#verdict");
   let detail="";
-  if(c.recommendationCode==="NEGOTIATE") detail=` · максимум ${money(Math.max(0,c.walkAwayPrice))}`;
-  if(c.recommendationCode==="HOLD") detail=" · закройте UNKNOWN hard gates";
+  if(c.recommendationCode==="NEGOTIATE") detail=" · максимум "+money(Math.max(0,c.walkAwayPrice));
+  if(c.recommendationCode==="HOLD") detail=" · нужны evidence / hard-gate данные";
+  const raw=o?priceLabel(o):"no offer";
+  const allIn=c.offer.conversionKnown?money(c.transactionAllInPrice):"UNKNOWN";
   v.className="verdict "+c.recommendationClass;
-  v.innerHTML=`<strong>${recommendationLabel(c)}</strong>${detail}<small>${escapeHtml(b.location||"")} · ask ${money(num(b.purchaseEUR))}</small>`;
+  v.innerHTML=`<strong>${recommendationLabel(c)}</strong>${detail}<small>${escapeHtml(b.location||"")} · ${escapeHtml(raw)} · all-in ${escapeHtml(allIn)}</small>`;
 
   $("#gateStrip").innerHTML=[
     gateBadge("Legal",c.gates.legal),gateBadge("Hull",c.gates.structural),
-    gateBadge("Logistics",c.gates.logistics),gateBadge("Liveability",c.gates.habitability),gateBadge("Insurance",c.gates.insurance)
+    gateBadge("Logistics",c.gates.logistics),gateBadge("Liveability",c.gates.habitability),
+    gateBadge("Insurance",c.gates.insurance),gateBadge("Evidence",c.evidenceGate)
   ].join("");
   renderDecisionReasons(b,c);
 
   const log=c.logistics.selected;
   const metrics=[
-    ["Walk-away",money(Math.max(0,c.walkAwayPrice)),"downside ceiling"],
-    ["Margin",signed(c.marginOfSafety),c.marginOfSafety>=0?"ниже потолка":"торг / отбой"],
-    ["Cost-to-Habitable",money(c.costToHabitable),"до жилого актива"],
-    ["Downside / мес",money(c.downsideHousingCostMonthly),`лимит ${money(c.budgetEUR)}`],
+    ["Current all-in",c.offer.conversionKnown?money(c.transactionAllInPrice):"UNKNOWN",o?priceLabel(o):"no offer"],
+    ["Cost-to-Habitable",money(c.costToHabitable),"ожидаемые потраченные деньги до заселения"],
+    ["Cash Required",money(c.cashRequired),"Cost-to-Habitable + reserve"],
+    ["Emergency Reserve",money(c.emergencyReserve),"остаётся резервом, не expense"],
+    ["Walk-away",money(Math.max(0,c.walkAwayPrice)),"max all-in before logistics"],
+    ["Margin",signed(c.marginOfSafety),c.marginOfSafety>=0?"all-in ниже потолка":"торг / отбой"],
+    ["Downside / мес",money(c.downsideHousingCostMonthly),"лимит "+money(c.budgetEUR)],
     ["Run-rate",money(c.monthly),"/ месяц"],
     ["Логистика",log?money(log.cost):"—",log?log.mode:"путь unknown"],
     ["Quick-sale",money(c.netQuickSale),"net downside"],
-    ["DIY value",signed(c.improvements.net),`${c.improvements.hours.toFixed(0)} ч`]
+    ["DIY value",signed(c.improvements.net),c.improvements.hours.toFixed(0)+" ч"]
   ];
   $("#metrics").innerHTML=metrics.map(([a,bv,sm])=>`<div class="metric"><span>${a}</span><strong>${bv}</strong><small>${sm}</small></div>`).join("");
   drawRadar(b);

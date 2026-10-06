@@ -208,8 +208,13 @@ function renderScenarioSummary(){
   ].map(([a,b])=>`<div class="scenario-chip"><span>${a}</span><strong>${b}</strong></div>`).join("");
 }
 
-function candidateMatchesFilter(c){
-  if(candidateFilter==="strong") return ["BUY_ZONE","CONSIDER","NEGOTIATE"].includes(c.recommendationCode);
+function isStrongCandidate(b,c){
+  if(["BUY_ZONE","CONSIDER","NEGOTIATE"].includes(c.recommendationCode)) return true;
+  if(c.recommendationCode!=="HOLD" || Object.values(c.gates).includes("FAIL")) return false;
+  return b.cabinsEvidence==="FACT" && num(b.cabins)>=2 && num(b.berths)>=6;
+}
+function candidateMatchesFilter(b,c){
+  if(candidateFilter==="strong") return isStrongCandidate(b,c);
   if(candidateFilter==="hold") return c.recommendationCode==="HOLD";
   if(candidateFilter==="reject") return ["WALK_AWAY","WEAK"].includes(c.recommendationCode);
   return true;
@@ -233,8 +238,8 @@ function renderTable(){
   const wrap=$("#candidateList"),stats=$("#portfolioStats"); if(!wrap)return;
   const priority={BUY_ZONE:0,CONSIDER:1,NEGOTIATE:2,HOLD:3,WEAK:4,WALK_AWAY:5};
   const all=state.boats.map(b=>({b,c:calc(b),o:currentOffer(b)})).sort((x,y)=>(priority[x.c.recommendationCode]??9)-(priority[y.c.recommendationCode]??9)||y.c.marginOfSafety-x.c.marginOfSafety);
-  const rows=all.filter(x=>candidateMatchesFilter(x.c));
-  const strong=all.filter(x=>["BUY_ZONE","CONSIDER","NEGOTIATE"].includes(x.c.recommendationCode)).length;
+  const rows=all.filter(x=>candidateMatchesFilter(x.b,x.c));
+  const strong=all.filter(x=>isStrongCandidate(x.b,x.c)).length;
   const hold=all.filter(x=>x.c.recommendationCode==="HOLD").length;
   const reject=all.filter(x=>["WALK_AWAY","WEAK"].includes(x.c.recommendationCode)).length;
   if(stats) stats.innerHTML=all.length+" всего<br>"+strong+" сильных · "+hold+" hold · "+reject+" отсев";

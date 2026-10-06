@@ -31,12 +31,15 @@ test("real offers -> price lineage -> decisions", async ({ page }) => {
 
   await page.getByRole("button", { name: /De Alm Kruiser/ }).click();
   await expect(page.locator("#verdict")).toContainText("ПАУЗА");
+  await expect(page.locator("#candidateSnapshot")).toContainText("Комфортно");
+  await expect(page.locator("#candidateSnapshot")).toContainText("?");
   await expect(page.locator("#currentOfferSummary")).toContainText("5,750");
   await expect(page.locator("#currentOfferSummary")).toContainText("7.002");
   await expect(page.locator("#openListingBtn")).toHaveAttribute("href", /boatauction\.com/);
   await expect(page.locator("#offerHistory .offer-history-row")).toHaveCount(1);
 
   await page.getByRole("button", { name: /ANKA/ }).click();
+  await expect(page.locator("#candidateSnapshot")).toContainText("?");
   await expect(page.locator("#currentOfferSummary")).toContainText("46,500");
   await expect(page.locator("#currentOfferSummary")).toContainText("10.814");
   await expect(page.locator("#offerHistory .offer-history-row")).toHaveCount(3);

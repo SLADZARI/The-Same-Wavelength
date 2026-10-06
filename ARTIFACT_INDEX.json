@@ -5,9 +5,9 @@
     {
       "artifactId": "ilka.product.boat-value-calculator",
       "documentType": "PRODUCT",
-      "currentVersion": "1.0",
+      "currentVersion": "1.1",
       "status": "APPROVED",
-      "path": "docs/product/boat-value-calculator.v1.0.md",
+      "path": "docs/product/boat-value-calculator.v1.1.md",
       "sourceSystem": "GIT",
       "authorityType": "APPROVED_AUTHORITY",
       "updated": "2026-10-06"
@@ -25,9 +25,19 @@
     {
       "artifactId": "ilka.domain.boat-value-calculator",
       "documentType": "DOMAIN",
+      "currentVersion": "1.1",
+      "status": "APPROVED",
+      "path": "docs/domain/boat-value-calculator.v1.1.json",
+      "sourceSystem": "GIT",
+      "authorityType": "APPROVED_AUTHORITY",
+      "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.change-proposal.acquisition-radar-liveability",
+      "documentType": "CHANGE_PROPOSAL",
       "currentVersion": "1.0",
       "status": "APPROVED",
-      "path": "docs/domain/boat-value-calculator.v1.0.json",
+      "path": "docs/change-proposal/acquisition-radar-liveability.v1.0.md",
       "sourceSystem": "GIT",
       "authorityType": "APPROVED_AUTHORITY",
       "updated": "2026-10-06"
@@ -35,9 +45,9 @@
     {
       "artifactId": "ilka.result.calculator-foundation",
       "documentType": "RESULT",
-      "currentVersion": "0.2",
+      "currentVersion": "0.3",
       "status": "DRAFT",
-      "path": "results/calculator-foundation.v0.2.md",
+      "path": "results/calculator-foundation.v0.3.md",
       "sourceSystem": "GIT",
       "authorityType": "IMPLEMENTATION_AUTHORITY",
       "updated": "2026-10-06"

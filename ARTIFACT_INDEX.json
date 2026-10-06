@@ -91,6 +91,16 @@
       "sourceSystem": "GIT",
       "authorityType": "APPROVED_AUTHORITY",
       "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.research.real-offer-fixtures",
+      "documentType": "RESEARCH",
+      "currentVersion": "0.1",
+      "status": "REVIEW",
+      "path": "evidence/real-offer-fixtures.v0.1.json",
+      "sourceSystem": "GIT",
+      "authorityType": "EVIDENCE",
+      "updated": "2026-10-06"
     }
   ]
 }

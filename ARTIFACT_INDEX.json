@@ -1,0 +1,116 @@
+{
+  "project": "ILKA Boat Value Calculator",
+  "updated": "2026-10-07",
+  "artifacts": [
+    {
+      "artifactId": "ilka.product.boat-value-calculator",
+      "documentType": "PRODUCT",
+      "currentVersion": "1.1",
+      "status": "APPROVED",
+      "path": "docs/product/boat-value-calculator.v1.1.md",
+      "sourceSystem": "GIT",
+      "authorityType": "APPROVED_AUTHORITY",
+      "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.decision.economic-baseline",
+      "documentType": "DECISION",
+      "currentVersion": "1.0",
+      "status": "APPROVED",
+      "path": "docs/decision/economic-baseline.v1.0.md",
+      "sourceSystem": "GIT",
+      "authorityType": "APPROVED_AUTHORITY",
+      "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.domain.boat-value-calculator",
+      "documentType": "DOMAIN",
+      "currentVersion": "1.3",
+      "status": "APPROVED",
+      "path": "docs/domain/boat-value-calculator.v1.3.json",
+      "sourceSystem": "GIT",
+      "authorityType": "APPROVED_AUTHORITY",
+      "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.change-proposal.acquisition-radar-liveability",
+      "documentType": "CHANGE_PROPOSAL",
+      "currentVersion": "1.0",
+      "status": "APPROVED",
+      "path": "docs/change-proposal/acquisition-radar-liveability.v1.0.md",
+      "sourceSystem": "GIT",
+      "authorityType": "APPROVED_AUTHORITY",
+      "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.result.calculator-foundation",
+      "documentType": "RESULT",
+      "currentVersion": "0.5",
+      "status": "REVIEW",
+      "path": "results/calculator-foundation.v0.5.md",
+      "sourceSystem": "GIT",
+      "authorityType": "IMPLEMENTATION_AUTHORITY",
+      "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.research.marina-offers",
+      "documentType": "RESEARCH",
+      "currentVersion": "0.1",
+      "status": "REVIEW",
+      "path": "evidence/marina-offers.v0.1.json",
+      "sourceSystem": "GIT",
+      "authorityType": "EVIDENCE",
+      "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.research.acquisition-liveaboard-model",
+      "documentType": "RESEARCH",
+      "currentVersion": "0.1",
+      "status": "REVIEW",
+      "path": "docs/research-v2-model.md",
+      "sourceSystem": "GIT",
+      "authorityType": "REFERENCE",
+      "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.report.acquisition-radar-validation",
+      "documentType": "REPORT",
+      "currentVersion": "0.1",
+      "status": "REVIEW",
+      "path": "reports/acquisition-radar-validation.v0.1.md",
+      "sourceSystem": "GIT",
+      "authorityType": "EVIDENCE",
+      "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.change-proposal.real-offer-g6-harmonization",
+      "documentType": "CHANGE_PROPOSAL",
+      "currentVersion": "1.0",
+      "status": "APPROVED",
+      "path": "docs/change-proposal/real-offer-g6-harmonization.v1.0.md",
+      "sourceSystem": "GIT",
+      "authorityType": "APPROVED_AUTHORITY",
+      "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.research.real-offer-fixtures",
+      "documentType": "RESEARCH",
+      "currentVersion": "0.1",
+      "status": "REVIEW",
+      "path": "evidence/real-offer-fixtures.v0.1.json",
+      "sourceSystem": "GIT",
+      "authorityType": "EVIDENCE",
+      "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.research.anka-wroclaw-czernica-weekend-route",
+      "documentType": "RESEARCH",
+      "currentVersion": "0.1",
+      "status": "REVIEW",
+      "path": "evidence/anka-wroclaw-czernica-weekend-route.v0.1.md",
+      "sourceSystem": "GIT",
+      "authorityType": "EVIDENCE",
+      "updated": "2026-10-07"
+    }
+  ]
+}

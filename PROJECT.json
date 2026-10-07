@@ -1,0 +1,69 @@
+{
+  "projectId": "ilka-boat-value-calculator",
+  "projectName": "ILKA Boat Value Calculator",
+  "canonicalRepository": "SLADZARI/The-Same-Wavelength",
+  "defaultBranch": "main",
+  "projectStage": "BUILD",
+  "readFirst": [
+    "ARTIFACT_INDEX.json",
+    "APPROVED_STATE.json",
+    "docs/product/boat-value-calculator.v1.1.md",
+    "docs/decision/economic-baseline.v1.0.md",
+    "docs/domain/boat-value-calculator.v1.3.json",
+    "docs/change-proposal/acquisition-radar-liveability.v1.0.md",
+    "docs/change-proposal/real-offer-g6-harmonization.v1.0.md",
+    "results/calculator-foundation.v0.5.md",
+    "reports/acquisition-radar-validation.v0.1.md",
+    "evidence/marina-offers.v0.1.json",
+    "evidence/real-offer-fixtures.v0.1.json",
+    "README.md",
+    "docs/research-v2-model.md"
+  ],
+  "authorityPointers": {
+    "PRODUCT": "ilka.product.boat-value-calculator",
+    "DOMAIN": "ilka.domain.boat-value-calculator",
+    "DECISION": [
+      "ilka.decision.economic-baseline"
+    ],
+    "CHANGE_PROPOSAL": [
+      "ilka.change-proposal.acquisition-radar-liveability",
+      "ilka.change-proposal.real-offer-g6-harmonization"
+    ]
+  },
+  "protectedAreas": [
+    "Budget baseline and housing-first economics",
+    "Two private cabins + six-place liveability requirement",
+    "Immediate move-in screening",
+    "Metric meanings",
+    "Evidence provenance and offer history"
+  ],
+  "currentResult": {
+    "artifactId": "ilka.result.calculator-foundation",
+    "path": "results/calculator-foundation.v0.5.md",
+    "branch": "feat/ilka-value-calculator"
+  },
+  "activeIntegrationBranch": "feat/ilka-value-calculator",
+  "currentGate": {
+    "gate": "G6_VALIDATION",
+    "status": "OPEN",
+    "reason": "Real-offer/evidence harmonization approved for implementation; G6 remains OPEN until real-fixture Playwright smoke passes."
+  },
+  "implementation": {
+    "entrypoint": "index.html",
+    "runtime": "static browser application",
+    "localState": "localStorage",
+    "durableDataRule": "localStorage is working state only; verified offers and price history must be promoted to Git EVIDENCE artifacts."
+  },
+  "evidenceIntake": {
+    "githubIssue": 2,
+    "url": "https://github.com/SLADZARI/The-Same-Wavelength/issues/2"
+  },
+  "doNotInfer": [
+    "Do not treat default calculator assumptions as market quotes.",
+    "Do not treat GitHub comments as approved Decisions.",
+    "Do not overwrite historical prices or offers when a newer quote arrives.",
+    "Do not copy private email bodies, personal phone numbers or private addresses into this public repository.",
+    "Do not include monetization income in the base housing viability case.",
+    "Do not treat expected market uplift from DIY improvements as FACT unless evidence supports it."
+  ]
+}

@@ -1,0 +1,302 @@
+{
+  "artifactId": "ilka.domain.boat-value-calculator",
+  "project": "ILKA Boat Value Calculator",
+  "documentType": "DOMAIN",
+  "projectStage": "DECISION",
+  "gate": "G2_DOMAIN_LOCK",
+  "status": "SUPERSEDED",
+  "version": "1.1",
+  "updated": "2026-10-06",
+  "owner": "Modern Pilgrims",
+  "sourceSystem": "GIT",
+  "authorityType": "HISTORY",
+  "supersedes": "1.0",
+  "entities": {
+    "BoatCandidate": {
+      "meaning": "A distinct boat candidate being evaluated.",
+      "attributes": [
+        "candidateId",
+        "name",
+        "model",
+        "location",
+        "dimensions",
+        "material",
+        "propulsion",
+        "privateCabins",
+        "berths",
+        "comfortablePeople",
+        "moveInPossible",
+        "liveaboardFeatures",
+        "notes"
+      ]
+    },
+    "BoatOffer": {
+      "meaning": "A time-bound seller/market offer for one BoatCandidate. Price history belongs here and must not overwrite candidate identity.",
+      "attributes": [
+        "offerId",
+        "candidateId",
+        "observedAt",
+        "source",
+        "sourceSite",
+        "externalListingId",
+        "sellerType",
+        "askingPrice",
+        "sellerCounterPrice",
+        "currency",
+        "included",
+        "conditions",
+        "status",
+        "comment"
+      ]
+    },
+    "MarinaOffer": {
+      "meaning": "A source-backed berth, liveaboard or wintering offer for a defined boat size and period.",
+      "attributes": [
+        "offerId",
+        "marinaName",
+        "location",
+        "observedAt",
+        "period",
+        "referenceBoat",
+        "availability",
+        "winterAfloat",
+        "liveaboardAllowed",
+        "pricing",
+        "utilities",
+        "facilities",
+        "access",
+        "conditions",
+        "source"
+      ]
+    },
+    "LogisticsOption": {
+      "meaning": "One feasible or rejected delivery/logistics option for a candidate.",
+      "attributes": [
+        "logisticsOptionId",
+        "candidateId",
+        "mode",
+        "feasible",
+        "route",
+        "estimatedCost",
+        "duration",
+        "assumptions",
+        "source"
+      ]
+    },
+    "RefitPlan": {
+      "meaning": "Costed work split into mandatory pre-move work and post-move improvements. DIY time is not treated as free.",
+      "attributes": [
+        "refitPlanId",
+        "candidateId",
+        "mandatoryItems",
+        "improvementItems",
+        "monthsToHabitable",
+        "mandatoryCost",
+        "postMoveCashCost",
+        "diyHours",
+        "diyShadowRatePLN",
+        "diyShadowCost",
+        "expectedMarketValueUplift",
+        "netValueCreation",
+        "notes"
+      ],
+      "improvementItemAttributes": [
+        "name",
+        "category",
+        "cashCostEUR",
+        "diyHours",
+        "expectedMarketValueUpliftEUR",
+        "factLabel",
+        "notes"
+      ]
+    },
+    "CostItem": {
+      "meaning": "A monetary input with original currency, timing and evidence/assumption status.",
+      "attributes": [
+        "costItemId",
+        "category",
+        "amount",
+        "currency",
+        "frequency",
+        "source",
+        "factLabel",
+        "notes"
+      ]
+    },
+    "GateAssessment": {
+      "meaning": "Hard decision gates that subjective scoring cannot override.",
+      "attributes": [
+        "gateAssessmentId",
+        "candidateId",
+        "legal",
+        "structural",
+        "logistics",
+        "habitability",
+        "insurance",
+        "evidenceRefs",
+        "notes"
+      ]
+    },
+    "Scenario": {
+      "meaning": "One evaluation composition linking a boat offer, marina offer, selected logistics option, refit plan, hard gates, FX assumptions and horizon.",
+      "attributes": [
+        "scenarioId",
+        "boatCandidateId",
+        "boatOfferId",
+        "marinaOfferId",
+        "logisticsOptionId",
+        "refitPlanId",
+        "gateAssessmentId",
+        "horizonMonths",
+        "fx",
+        "costItems"
+      ]
+    },
+    "EvaluationSnapshot": {
+      "meaning": "Derived decision metrics from one Scenario at one calculation state.",
+      "attributes": [
+        "snapshotId",
+        "scenarioId",
+        "calculatedAt",
+        "decisionState",
+        "metrics",
+        "inputRefs"
+      ]
+    },
+    "EvidenceRef": {
+      "meaning": "Recoverable pointer/label describing where a material fact came from without copying private source content into public Git.",
+      "attributes": [
+        "sourceSystem",
+        "sourceType",
+        "sourceLabel",
+        "observedAt",
+        "privacyNote"
+      ]
+    }
+  },
+  "enums": {
+    "factLabel": [
+      "FACT",
+      "INFERENCE",
+      "PROPOSAL",
+      "DECISION",
+      "UNKNOWN"
+    ],
+    "offerStatus": [
+      "OBSERVED",
+      "CONTACTED",
+      "NEGOTIATING",
+      "REJECTED",
+      "ACCEPTED",
+      "WITHDRAWN",
+      "SOLD"
+    ],
+    "sellerType": [
+      "PRIVATE",
+      "BROKER",
+      "DEALER",
+      "AUCTION",
+      "OTHER",
+      "UNKNOWN"
+    ],
+    "logisticsMode": [
+      "LOCAL",
+      "SEA",
+      "ROAD"
+    ],
+    "hardGateState": [
+      "UNKNOWN",
+      "PASS",
+      "FAIL"
+    ],
+    "moveInState": [
+      "UNKNOWN",
+      "YES",
+      "NO"
+    ],
+    "marinaAvailability": [
+      "AVAILABLE",
+      "NOT_AVAILABLE",
+      "LAND_ONLY",
+      "UNKNOWN"
+    ],
+    "decisionState": [
+      "HOLD",
+      "WALK_AWAY",
+      "ECONOMIC_EVAL"
+    ]
+  },
+  "habitabilityRule": {
+    "pass": "moveInPossible = YES AND privateCabins >= 2 AND berths >= 6.",
+    "fail": "moveInPossible = NO OR known privateCabins < 2 OR known berths < 6.",
+    "unknown": "Any required habitability field is UNKNOWN.",
+    "note": "Permanent installed heating is not required for PASS if temporary safe shore-powered heating is feasible."
+  },
+  "metrics": {
+    "acquisitionCost": "asking/current transaction price + due diligence + closing/document costs",
+    "selectedLogisticsCost": "minimum cost among feasible LOCAL / SEA / ROAD options",
+    "mandatoryRefitCost": "mandatory work required before move-in",
+    "overlapHousingCost": "rent/temporary housing paid while move-in is not possible",
+    "costToHabitable": "acquisitionCost + selectedLogisticsCost + mandatoryRefitCost + overlapHousingCost",
+    "postMoveImprovementCash": "sum improvementItems.cashCostEUR",
+    "diyHours": "sum improvementItems.diyHours",
+    "diyShadowCost": "diyHours × editable diyShadowRatePLN converted to scenario currency",
+    "improvementMarketUplift": "sum improvementItems.expectedMarketValueUpliftEUR",
+    "improvementNetValueCreation": "improvementMarketUplift - postMoveImprovementCash - diyShadowCost",
+    "valueCreatedPerDIYHour": "(improvementMarketUplift - postMoveImprovementCash) / diyHours when diyHours > 0",
+    "monthlyRunRate": "marina + insurance + maintenance reserve + utilities + heating + local fuel + communications + winter equivalent + misc",
+    "cashCost": "costToHabitable + postMoveImprovementCash + monthlyRunRate × horizonMonths",
+    "netExpectedSaleProceeds": "expected resale value - selling costs",
+    "netQuickSaleProceeds": "quick-sale value - selling costs",
+    "economicCost": "cashCost + diyShadowCost - netExpectedSaleProceeds",
+    "downsideEconomicCost": "cashCost + diyShadowCost - netQuickSaleProceeds",
+    "equivalentHousingCostMonthly": "economicCost / horizonMonths",
+    "downsideHousingCostMonthly": "downsideEconomicCost / horizonMonths",
+    "deltaVsRent": "economicCost - rent alternative over the same horizon",
+    "downsideDeltaVsRent": "downsideEconomicCost - rent alternative over the same horizon",
+    "walkAwayPrice": "budget over horizon + netQuickSaleProceeds - non-purchase cash costs - diyShadowCost - risk buffer",
+    "marginOfSafety": "walkAwayPrice - current asking price",
+    "maxPurchaseVsRent": "rent alternative over horizon + netQuickSaleProceeds - non-purchase cash costs - diyShadowCost - risk buffer",
+    "valueScore": "weighted utility/object-quality score independent of price",
+    "valueIndex": "valueScore / economicCost in EUR thousands"
+  },
+  "gateRule": {
+    "fail": "If any hard gate is FAIL, decisionState = WALK_AWAY.",
+    "unknown": "If no gate is FAIL and at least one hard gate is UNKNOWN, decisionState = HOLD.",
+    "pass": "Only when all hard gates are PASS may the economics produce a buy/price recommendation."
+  },
+  "relations": [
+    "BoatCandidate has many BoatOffer",
+    "BoatCandidate has many LogisticsOption",
+    "BoatCandidate has many RefitPlan",
+    "BoatCandidate has GateAssessment",
+    "Scenario references one BoatCandidate and may reference one BoatOffer",
+    "Scenario may reference one MarinaOffer",
+    "Scenario references one selected LogisticsOption",
+    "Scenario references one RefitPlan",
+    "Scenario references one GateAssessment",
+    "Scenario has many CostItem",
+    "EvaluationSnapshot derives from one Scenario",
+    "EvidenceRef may support BoatOffer, MarinaOffer, LogisticsOption, RefitPlan, GateAssessment or CostItem"
+  ],
+  "aliases": {
+    "Landed cost": "costToHabitable when overlap housing is zero; deprecated as the primary KPI",
+    "Max buy vs rent": "maxPurchaseVsRent",
+    "Monthly run-rate": "monthlyRunRate",
+    "DIY value": "improvementNetValueCreation"
+  },
+  "deprecated": {
+    "single resaleEUR as downside value": "Use expected resale and quick-sale value separately for base and downside views.",
+    "Hamburg-specific logistics template as project default": "Use listing location plus LOCAL / SEA / ROAD options per candidate."
+  },
+  "deferred": [
+    "Tow/commercial freight logistics modes",
+    "Lifecycle component CAPEX schedule",
+    "Monte Carlo / probability distributions",
+    "Opportunity-cost discounting",
+    "Monetization/commercial scenarios",
+    "Actual-vs-budget ledger",
+    "Marketplace parser implementation"
+  ],
+  "supersededBy": "1.2"
+}

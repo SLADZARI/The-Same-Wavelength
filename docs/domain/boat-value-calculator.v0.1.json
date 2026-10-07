@@ -1,0 +1,146 @@
+{
+  "artifactId": "ilka.domain.boat-value-calculator",
+  "project": "ILKA Boat Value Calculator",
+  "documentType": "DOMAIN",
+  "projectStage": "CLARITY",
+  "gate": "G2_DOMAIN_LOCK",
+  "status": "SUPERSEDED",
+  "version": "0.1",
+  "updated": "2026-10-06",
+  "owner": "Modern Pilgrims",
+  "sourceSystem": "GIT",
+  "authorityType": "HISTORY",
+  "supersedes": null,
+  "entities": {
+    "BoatCandidate": {
+      "meaning": "A distinct physical/model candidate being evaluated.",
+      "attributes": [
+        "candidateId",
+        "name",
+        "model",
+        "location",
+        "dimensions",
+        "material",
+        "propulsion",
+        "liveaboardFeatures",
+        "notes"
+      ]
+    },
+    "BoatOffer": {
+      "meaning": "A time-bound market or negotiated commercial offer for a BoatCandidate. Price history belongs here, not on the candidate identity.",
+      "attributes": [
+        "offerId",
+        "candidateId",
+        "observedAt",
+        "source",
+        "askingPrice",
+        "negotiatedPrice",
+        "currency",
+        "included",
+        "conditions",
+        "status"
+      ]
+    },
+    "MarinaOffer": {
+      "meaning": "A source-backed berth/wintering offer or availability response for a defined boat size and period.",
+      "attributes": [
+        "offerId",
+        "marinaName",
+        "location",
+        "observedAt",
+        "period",
+        "referenceBoat",
+        "availability",
+        "winterAfloat",
+        "liveaboardAllowed",
+        "pricing",
+        "utilities",
+        "facilities",
+        "access",
+        "conditions",
+        "source"
+      ]
+    },
+    "CostItem": {
+      "meaning": "A monetary input attached to a scenario, with original currency and evidence/assumption status.",
+      "attributes": [
+        "costItemId",
+        "category",
+        "amount",
+        "currency",
+        "frequency",
+        "source",
+        "factLabel",
+        "notes"
+      ]
+    },
+    "Scenario": {
+      "meaning": "One evaluation composition of boat offer, logistics, marina offer, refit assumptions, FX assumptions and horizon.",
+      "attributes": [
+        "scenarioId",
+        "boatCandidateId",
+        "boatOfferId",
+        "logisticsMode",
+        "marinaOfferId",
+        "horizonMonths",
+        "fx",
+        "costItems"
+      ]
+    },
+    "EvaluationSnapshot": {
+      "meaning": "Derived metrics from one Scenario at one calculation state.",
+      "attributes": [
+        "snapshotId",
+        "scenarioId",
+        "calculatedAt",
+        "metrics",
+        "inputRefs"
+      ]
+    },
+    "EvidenceRef": {
+      "meaning": "Recoverable pointer/label describing where a material fact came from without copying private source content into public Git.",
+      "attributes": [
+        "sourceSystem",
+        "sourceType",
+        "sourceLabel",
+        "observedAt",
+        "privacyNote"
+      ]
+    }
+  },
+  "metrics": {
+    "landedCost": "purchase + selected logistics + mandatory initial refit",
+    "monthlyRunRate": "marina + insurance + maintenance reserve + utilities + heating + local fuel + communications + winter equivalent + misc",
+    "cashCost": "landedCost + monthlyRunRate × horizonMonths",
+    "economicCost": "cashCost - expected retained/resale value",
+    "allInEconomicMonthly": "economicCost / horizonMonths",
+    "deltaVsRent": "economicCost - rent alternative over the same horizon",
+    "maxPurchaseCash": "budget over horizon - logistics - refit - operating costs over horizon",
+    "maxPurchaseEconomic": "budget over horizon + expected retained value - logistics - refit - operating costs over horizon",
+    "maxPurchaseVsRent": "rent alternative over horizon + expected retained value - logistics - refit - operating costs over horizon",
+    "valueScore": "weighted object-quality score independent of price",
+    "valueIndex": "valueScore / economicCost in EUR thousands",
+    "payback": "capital-at-risk / monthly housing saving when housing saving is positive"
+  },
+  "aliases": {
+    "Max buy @ budget": "maxPurchaseEconomic",
+    "Cash-only ceiling": "maxPurchaseCash",
+    "Max buy vs rent": "maxPurchaseVsRent",
+    "Monthly run-rate": "monthlyRunRate",
+    "12m economic": "economicCost"
+  },
+  "relations": [
+    "BoatCandidate has many BoatOffer",
+    "Scenario references one BoatCandidate and may reference one BoatOffer",
+    "Scenario may reference one MarinaOffer",
+    "Scenario has many CostItem",
+    "EvaluationSnapshot derives from one Scenario",
+    "EvidenceRef may support BoatOffer, MarinaOffer or CostItem"
+  ],
+  "deprecated": {},
+  "reviewQuestions": [
+    "Should monetization become part of this domain or remain a separate future DOMAIN extension?",
+    "Should actual expense tracking reuse CostItem or introduce a separate runtime ledger only when implementation requires it?"
+  ],
+  "supersededBy": "1.0"
+}

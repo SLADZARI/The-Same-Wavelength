@@ -1,6 +1,6 @@
 {
   "project": "ILKA Boat Value Calculator",
-  "updated": "2026-10-06",
+  "updated": "2026-10-07",
   "artifacts": [
     {
       "artifactId": "ilka.product.boat-value-calculator",
@@ -101,6 +101,16 @@
       "sourceSystem": "GIT",
       "authorityType": "EVIDENCE",
       "updated": "2026-10-06"
+    },
+    {
+      "artifactId": "ilka.research.anka-wroclaw-czernica-weekend-route",
+      "documentType": "RESEARCH",
+      "currentVersion": "0.1",
+      "status": "REVIEW",
+      "path": "evidence/anka-wroclaw-czernica-weekend-route.v0.1.md",
+      "sourceSystem": "GIT",
+      "authorityType": "EVIDENCE",
+      "updated": "2026-10-07"
     }
   ]
 }
